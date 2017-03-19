@@ -1,19 +1,17 @@
 define(function() {
     "use strict";
     /**
-     * @author Cenfun
+     * @build 2011.11.30
+     * @author Kevin Zhu
      */
     var $ = window.$;
-
+    var Extend = require("./extend.js");
     //====================================================================================================
     /**
      * @constructor
      * @returns {EventBase}
      */
-    var EventBase = function() {
-        //depend on jQuery event
-    };
-    EventBase.prototype = {
+    var EventBase = Extend.extend({
         dispatcher: null,
         getDispatcher: function() {
             if (!this.dispatcher) {
@@ -38,10 +36,10 @@ define(function() {
         },
         trigger: function() {
             var dispatcher = this.getDispatcher();
-            dispatcher.trigger.apply(dispatcher, arguments);
-            return this;
+            //use triggerHandler replace trigger to stop default events
+            return dispatcher.triggerHandler.apply(dispatcher, arguments);
         }
-    };
+    });
 
     return EventBase;
 

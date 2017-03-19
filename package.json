@@ -1,5 +1,5 @@
 {
-    "name": "CMP5",
+    "name": "cmp5",
     "version": "0.0.1",
     "description": "CMP5",
     "license": "MIT",
@@ -22,7 +22,10 @@
 
     },
     "devDependencies": {
-        "gulp": "^3.9.1"
+        "gulp": "*",
+        "gulp-util": "*",
+        "webpack": "*",
+        "webpack-dev-server": "*"
     },
     "scripts": {
 
@@ -31,8 +34,7 @@
     "files": [
         "cmp5.js",
         "cmp5.min.js",
-        "cmp5.min.map",
-        "LICENSE"
+        "cmp5.min.map"
     ]
 
 }
