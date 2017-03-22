@@ -7,6 +7,9 @@ define(function() {
 
     var CMP5 = EventBase.extend({
 
+    	constructor : function() {
+    		console.log(this);
+    	}
 
     });
 

@@ -1,40 +1,33 @@
 {
-    "name": "cmp5",
-    "version": "0.0.1",
-    "description": "CMP5",
-    "license": "MIT",
-    "homepage": "http://www.cenfun.com",
-    "keywords": [
-        "CMP"
-    ],
-    "author": {
-        "name": "Cenfun",
-        "email": "cenfun@qq.com"
-    },
-    "repository": {
-        "type": "git",
-        "url": "git://github.com/cenfun/cmp5.git"
-    },
-
-    "main": "cmp5.js",
-
-    "dependencies": {
-
-    },
-    "devDependencies": {
-        "gulp": "*",
-        "gulp-util": "*",
-        "webpack": "*",
-        "webpack-dev-server": "*"
-    },
-    "scripts": {
-
-    },
-
-    "files": [
-        "cmp5.js",
-        "cmp5.min.js",
-        "cmp5.min.map"
-    ]
-
+  "name": "cmp5",
+  "version": "0.0.1",
+  "description": "CMP5",
+  "license": "MIT",
+  "homepage": "http://www.cenfun.com",
+  "keywords": [
+    "CMP"
+  ],
+  "author": {
+    "name": "Cenfun",
+    "email": "cenfun@qq.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/cenfun/cmp5.git"
+  },
+  "main": "cmp5.js",
+  "dependencies": {},
+  "devDependencies": {
+    "browser-sync": "^2.18.8",
+    "gulp": "^3.9.1",
+    "gulp-util": "*",
+    "webpack": "*",
+    "webpack-dev-server": "*"
+  },
+  "scripts": {},
+  "files": [
+    "cmp5.js",
+    "cmp5.min.js",
+    "cmp5.min.map"
+  ]
 }

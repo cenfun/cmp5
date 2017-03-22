@@ -5,8 +5,11 @@ var gulp = require('gulp');
 var gutil = require("gulp-util");
 
 var webpack = require("webpack");
-var WebpackDevServer = require("webpack-dev-server");
+//var WebpackDevServer = require("webpack-dev-server");
 var webpackConfig = require("./webpack.config.js");
+
+var browserSync = require('browser-sync').create("my_demo_server");
+
 
 gulp.task("build", ["build-minify"], function(callback) {
     var myConfig = Object.create(webpackConfig);
@@ -17,6 +20,7 @@ gulp.task("build", ["build-minify"], function(callback) {
         if (err) {
             throw new gutil.PluginError("build", err);
         }
+        browserSync.reload();
         callback();
     });
 });
@@ -49,6 +53,14 @@ gulp.task("build-minify", function(callback) {
 
 
 gulp.task("preview", function(callback) {
+
+
+    browserSync.init({
+        //proxy: "http://www.bbc.co.uk"
+        server: ["./build", "./demo"]
+    });
+
+    /*
     var myConfig = Object.create(webpackConfig);
 
     // Start a webpack-dev-server
@@ -72,7 +84,7 @@ gulp.task("preview", function(callback) {
             throw new gutil.PluginError("preview", err);
         }
 
-        var url = "http://localhost:8080/webpack-dev-server/index.html";
+        var url = "http://localhost:8080/";
 
         // Server listening
         console.log("[preview]", url);
@@ -82,20 +94,16 @@ gulp.task("preview", function(callback) {
         // keep the server alive or continue?
         callback();
     });
+    */
 });
 
 gulp.task('watch', function() {
     gulp.watch(["./src/**/*"], ['build']);
+    gulp.watch(["./demo/**/*"]).on('change', function() {
+        browserSync.reload();
+        browserSync.notify("demo <span color='green'>change</span>");
+    });
 });
 
 
 gulp.task('default', ['build', 'watch', 'preview']);
-
-//gulp.task('default', ['webpack'], function() {
-// place code for your default task here
-//console.log("start");
-
-//gulp.watch(["./src/**/*"], ['webpack']);
-
-
-//});
