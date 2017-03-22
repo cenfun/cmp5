@@ -160,6 +160,105 @@ define(function() {
                 }
             }
             return defaultValue;
+        },
+
+        merge: function() {
+            var arg = arguments;
+            var len = arg.length;
+            //no parameters
+            if (!len) {
+                return {};
+            }
+            //deep merge depend on last parameter 
+            var deep = true;
+            if (arg[len - 1] === false) {
+                deep = false;
+            }
+            //===================================
+            var isobj = Util.isobj;
+            var merge = Util.merge;
+            //===================================
+
+            var copyArray = function(item, base) {
+                //merge array to base
+                var size = item.length;
+                for (var k = 0; k < size; k++) {
+                    var vk = item[k];
+                    if (deep && isobj(vk)) {
+                        base[k] = merge(base[k], vk);
+                    } else {
+                        base[k] = vk;
+                    }
+                }
+                //length fixing for array
+                base.length = size;
+            };
+
+            var copyObject = function(item, base) {
+                //merge object to base
+                Object.keys(item).forEach(function(n) {
+                    var v = item[n];
+                    if (base.hasOwnProperty(n) && deep && isobj(v)) {
+                        base[n] = merge(base[n], v);
+                    } else {
+                        base[n] = v;
+                    }
+                });
+            };
+
+            var copyAO = function(item, base) {
+                //merge to base
+                if (item instanceof Array) {
+                    copyArray(item, base);
+                } else {
+                    copyObject(item, base);
+                }
+            };
+
+            var eachCopy = function() {
+                //base merge result
+                var base = null;
+                for (var i = 0; i < len; i++) {
+                    var item = arg[i];
+                    //only for valid object or array
+                    if (!isobj(item)) {
+                        continue;
+                    }
+                    //base type depend on first parameter
+                    if (base === null) {
+                        base = (item instanceof Array) ? [] : {};
+                    }
+                    copyAO(item, base);
+                }
+                return base;
+            };
+
+            var base = eachCopy();
+
+            return base;
+        },
+        //if is plain object or array
+        isobj: function(obj) {
+            if (!obj || typeof(obj) !== "object" || typeof(obj.constructor) !== "function") {
+                return false;
+            }
+            var isAO = function(o) {
+                //does not need toString in Array
+                if (o.constructor === Array) {
+                    return true;
+                }
+                if (o.constructor === Object && typeof(o.toString) === "function" && o.toString() === "[object Object]") {
+                    //remove like Math Window ...
+                    return true;
+                }
+                return false;
+            };
+
+            if (isAO(obj)) {
+                return true;
+            }
+
+            return false;
         }
 
     };

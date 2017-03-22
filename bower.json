@@ -1,8 +1,17 @@
 {
     "name": "cmp5",
-    "main": "build/cmp5.min.js",
+    "main": "build/cmp5.js",
     "dependencies": {
-        "jquery": "^2.2.2"
+        "jquery": "^3.2.1"
     },
-    "devDependencies": {}
+    "devDependencies": {},
+    "homepage": "https://github.com/cenfun/cmp5",
+    "authors": [
+        "cenfun <cenfun@gmail.com>"
+    ],
+    "description": "cmp5",
+    "keywords": [
+        "cmp5"
+    ],
+    "license": "MIT"
 }

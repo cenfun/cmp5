@@ -5,14 +5,57 @@ define(function() {
 
     var EventBase = require("./core/event-base.js");
 
-    var CMP5 = EventBase.extend({
+    var defaultConfig = require("./default-config.js");
 
-    	constructor : function() {
-    		console.log(this);
-    	}
+    require("./cmp5.css");
+    var template = require("./template.html");
+
+    var CMP = EventBase.extend({
+
+        constructor: function(container) {
+            if (arguments.length) {
+                this.setContainer(container);
+            }
+        },
+
+        setContainer: function(container) {
+            this.container = $(container).addClass("cmp5");
+            return this;
+        },
+
+        setConfig: function(config) {
+            this.config = Util.merge({}, defaultConfig, config);
+            return this;
+        },
+
+        setList: function(list) {
+            if (!Util.islist(list)) {
+                return this;
+            }
+            this.list = list;
+        },
+
+        play: function(index) {
+
+            console.log(111);
+
+            $(template).appendTo(this.container);
+
+        },
+
+        toString: function() {
+            return "[object CMP]";
+        }
 
     });
 
-    return CMP5;
+
+    var cmp5 = {
+
+        CMP: CMP
+
+    };
+
+    return cmp5;
 
 });

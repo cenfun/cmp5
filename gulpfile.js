@@ -7,11 +7,14 @@ var gutil = require("gulp-util");
 
 var webpack = require("webpack");
 var webpackConfig = require("./webpack.config.js");
-
+var wiredep = require("wiredep");
 var browserSync = require('browser-sync').create("my_demo_server");
 
 
-gulp.task("build", ["build-minify"], function(callback) {
+gulp.task('default', ['build', 'watch', 'preview']);
+
+
+gulp.task("build", ["wiredep", "build-minify"], function() {
 
     browserSync.notify("building ...");
 
@@ -24,11 +27,10 @@ gulp.task("build", ["build-minify"], function(callback) {
             throw new gutil.PluginError("build", err);
         }
         browserSync.reload();
-        callback();
     });
 });
 
-gulp.task("build-minify", function(callback) {
+gulp.task("build-minify", function() {
 
     browserSync.notify("minify building ...");
 
@@ -53,30 +55,66 @@ gulp.task("build-minify", function(callback) {
         if (err) {
             throw new gutil.PluginError("build", err);
         }
-        callback();
     });
 });
 
 
-gulp.task("preview", function(callback) {
+gulp.task("preview", function() {
 
     browserSync.init({
         port: 8080,
-        ui :{
+        ui: {
             port: 8081
         },
-        //proxy: "http://www.bbc.co.uk"
-        server: ["./build", "./demo"]
+        //proxy: ""
+        server: ["./bower_components", "./build", "./demo"]
     });
 
 });
 
 gulp.task('watch', function() {
     gulp.watch(["./src/**/*"], ['build']);
-    gulp.watch(["./demo/**/*"]).on('change', function() {
+    gulp.watch(["./demo/**/*", "./build/**/*"]).on('change', function() {
         browserSync.reload();
     });
 });
 
 
-gulp.task('default', ['build', 'watch', 'preview']);
+gulp.task("wiredep", function() {
+
+    //https://www.npmjs.com/package/wiredep
+    wiredep({
+
+        src: './demo/index.html',
+
+        //cwd: "./",
+
+        // default: '.bowerrc'.directory || bower_components 
+        //directory: 'bower_components',
+        // default: require('./bower.json') 
+        //bowerJson: 'bower.json',
+
+        dependencies: true,
+        devDependencies: true,
+        includeSelf: true,
+        exclude: [],
+
+        ignorePath: /\.\.\/.+?\//,
+
+        fileTypes: {
+            html: {
+                block: /(([ \t]*)<!--\s*bower:*(\S*)\s*-->)(\n|\r|.)*?(<!--\s*endbower\s*-->)/gi,
+                detect: {
+                    js: /<script.*src=['"]([^'"]+)/gi,
+                    css: /<link.*href=['"]([^'"]+)/gi
+                },
+                replace: {
+                    js: '<script src="{{filePath}}"></script>',
+                    css: '<link rel="stylesheet" href="{{filePath}}" />'
+                }
+            }
+
+        }
+
+    });
+});

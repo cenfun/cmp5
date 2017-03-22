@@ -1,10 +1,10 @@
 ﻿window.cmp5.config = {
-    name: "CMP4 - 『生活需要音乐』",
+    name: "CMP5 - 『生活需要音乐』",
     link: "http://bbs.cenfun.com/",
-    description: "CMP4 - 『生活需要音乐』 - http://bbs.cenfun.com/",
+    description: "CMP5 - 『生活需要音乐』 - http://bbs.cenfun.com/",
     logo: "{src:logo.png,xywh:[10R,10R,0,0]}",
 
-    skins: "skins/default.js",
+    skins: "skins/skin_default.js",
     plugins: "",
     backgrounds: "",
     lists: "",
