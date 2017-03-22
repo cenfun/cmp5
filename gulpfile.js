@@ -61,6 +61,10 @@ gulp.task("build-minify", function(callback) {
 gulp.task("preview", function(callback) {
 
     browserSync.init({
+        port: 8080,
+        ui :{
+            port: 8081
+        },
         //proxy: "http://www.bbc.co.uk"
         server: ["./build", "./demo"]
     });
