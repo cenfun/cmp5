@@ -20,9 +20,8 @@
   "devDependencies": {
     "browser-sync": "^2.18.8",
     "gulp": "^3.9.1",
-    "gulp-util": "*",
-    "webpack": "*",
-    "webpack-dev-server": "*"
+    "gulp-util": "^3.0.8",
+    "webpack": "^2.3.0"
   },
   "scripts": {},
   "files": [
