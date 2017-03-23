@@ -11,10 +11,10 @@ var wiredep = require("wiredep");
 var browserSync = require('browser-sync').create("my_demo_server");
 
 
-gulp.task('default', ['build', 'watch', 'preview']);
+gulp.task('default', ['build', "wiredep", 'preview', 'watch']);
 
 
-gulp.task("build", ["wiredep", "build-minify"], function() {
+gulp.task("build", function() {
 
     browserSync.notify("building ...");
 

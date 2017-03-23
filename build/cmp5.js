@@ -80,7 +80,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 0 */
 /***/ (function(module, exports) {
 
-module.exports = "<audio></audio>"
+module.exports = "<div class=\"cmp_view\">\r\n\r\n\r\n    <div class=\"cmp_media\">\r\n        <audio class=\"cmp_audio\" src=\"\" autoplay=\"1\" loop=\"0\" preload=\"1\" controls=\"controls\">\r\n    </audio>\r\n        <video class=\"cmp_video\" src=\"\"></video>\r\n    </div>\r\n\r\n</div>"
 
 /***/ }),
 /* 1 */
