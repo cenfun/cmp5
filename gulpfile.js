@@ -28,9 +28,10 @@ gulp.task("build", function() {
         }
         browserSync.reload();
     });
+
 });
 
-gulp.task("build-minify", function() {
+gulp.task("min", function() {
 
     browserSync.notify("minify building ...");
 
@@ -60,14 +61,15 @@ gulp.task("build-minify", function() {
 
 
 gulp.task("preview", function() {
-
+    //https://www.npmjs.com/package/browser-sync
+    //https://browsersync.io/docs/options
     browserSync.init({
         port: 8080,
         ui: {
             port: 8081
         },
         //proxy: ""
-        server: ["./bower_components", "./build", "./demo"]
+        server: ["./demo", "./build", "./bower_components"]
     });
 
 });

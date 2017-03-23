@@ -1,6 +1,6 @@
 var path = require("path");
 module.exports = {
-    entry: "./src/cmp5.js",
+    entry: "./src/cmp.js",
     output: {
         path: path.join(__dirname, "./build"),
         library: "cmp5",

@@ -73,96 +73,11 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 14);
+/******/ 	return __webpack_require__(__webpack_require__.s = 15);
 /******/ })
 /************************************************************************/
 /******/ ([
 /* 0 */
-/***/ (function(module, exports) {
-
-module.exports = "<div class=\"cmp_view\">\r\n\r\n\r\n    <div class=\"cmp_media\">\r\n        <audio class=\"cmp_audio\" src=\"\" autoplay=\"1\" loop=\"0\" preload=\"1\" controls=\"controls\">\r\n    </audio>\r\n        <video class=\"cmp_video\" src=\"\"></video>\r\n    </div>\r\n\r\n</div>"
-
-/***/ }),
-/* 1 */
-/***/ (function(module, exports, __webpack_require__) {
-
-// style-loader: Adds some css to the DOM by adding a <style> tag
-
-// load the styles
-var content = __webpack_require__(7);
-if(typeof content === 'string') content = [[module.i, content, '']];
-// add the styles to the DOM
-var update = __webpack_require__(11)(content, {});
-if(content.locals) module.exports = content.locals;
-// Hot Module Replacement
-if(false) {
-	// When the styles change, update the <style> tags
-	if(!content.locals) {
-		module.hot.accept("!!../node_modules/css-loader/index.js!./cmp5.css", function() {
-			var newContent = require("!!../node_modules/css-loader/index.js!./cmp5.css");
-			if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
-			update(newContent);
-		});
-	}
-	// When the module is disposed, remove the <style> tags
-	module.hot.dispose(function() { update(); });
-}
-
-/***/ }),
-/* 2 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_RESULT__ = function() {
-    "use strict";
-    /**
-     * @build 2011.11.30
-     * @author Kevin Zhu
-     */
-    var $ = window.$;
-    var Extend = __webpack_require__(15);
-    //====================================================================================================
-    /**
-     * @constructor
-     * @returns {EventBase}
-     */
-    var EventBase = Extend.extend({
-        dispatcher: null,
-        getDispatcher: function() {
-            if (!this.dispatcher) {
-                this.dispatcher = $(this);
-            }
-            return this.dispatcher;
-        },
-        bind: function() {
-            var dispatcher = this.getDispatcher();
-            dispatcher.bind.apply(dispatcher, arguments);
-            return this;
-        },
-        one: function() {
-            var dispatcher = this.getDispatcher();
-            dispatcher.one.apply(dispatcher, arguments);
-            return this;
-        },
-        unbind: function() {
-            var dispatcher = this.getDispatcher();
-            dispatcher.unbind.apply(dispatcher, arguments);
-            return this;
-        },
-        trigger: function() {
-            var dispatcher = this.getDispatcher();
-            //use triggerHandler replace trigger to stop default events
-            return dispatcher.triggerHandler.apply(dispatcher, arguments);
-        }
-    });
-
-    return EventBase;
-
-}.call(exports, __webpack_require__, exports, module),
-				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
-
-
-/***/ }),
-/* 3 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_RESULT__ = function() {
@@ -436,7 +351,268 @@ var __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_RESULT__ = function() {
 				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
 /***/ }),
+/* 1 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_RESULT__ = function() {
+    'use strict';
+
+    var EventBase = __webpack_require__(16);
+
+    var ViewBase = EventBase.extend({
+
+        //================================
+        //container display
+        holder: null,
+        container: null,
+        containerAutoResize: true,
+
+        width: 0,
+        height: 0,
+        visible: true,
+
+        constructor: function() {
+
+        },
+
+        //================================
+        getContainer: function() {
+            return this.container;
+        },
+        setContainer: function(container) {
+            this.container = $(container);
+            return this;
+        },
+
+        //================================
+        //size api
+        setSize: function() {
+            if (!this.container) {
+                return this;
+            }
+            var newSize = this.getNewSize.apply(this, arguments);
+            var nw = newSize.width;
+            var nh = newSize.height;
+            if (this.width !== nw || this.height !== nh) {
+                this.width = nw;
+                this.height = nh;
+                this.setSizeNow();
+            }
+            return this;
+        },
+
+        getNewSize: function() {
+            var w = this.width;
+            var h = this.height;
+            if (arguments.length) {
+                var nw = Math.round(arguments[0]);
+                if (nw >= 0) {
+                    w = nw;
+                }
+                if (arguments.length > 1) {
+                    var nh = Math.round(arguments[1]);
+                    if (nh >= 0) {
+                        h = nh;
+                    }
+                }
+            } else {
+                w = this.container.width();
+                h = this.container.height();
+            }
+            return {
+                width: w,
+                height: h
+            };
+        },
+
+        setSizeNow: function() {
+            if (!this.containerAutoResize) {
+                this.container.width(this.width).height(this.height);
+            }
+            this.trigger("resize");
+            return this;
+        },
+
+        //get and update current size base on container
+        getSize: function(holder) {
+            var elem = $(holder || this.container);
+            var width = elem.width();
+            var height = elem.height();
+            var offset = elem.offset();
+            if (!holder) {
+                //update for owner
+                this.width = width;
+                this.height = height;
+                this.offset = offset;
+            }
+            return {
+                width: width,
+                height: height,
+                offset: offset
+            };
+        },
+        //================================
+        //visible api
+        show: function() {
+            if (this.container) {
+                this.container.show();
+            }
+            this.visible = true;
+            this.trigger("display", true);
+            return this;
+        },
+        hide: function() {
+            this.visible = false;
+            if (this.container) {
+                this.container.hide();
+            }
+            this.trigger("display", false);
+            return this;
+        },
+        //================================
+        //remove api
+        beforeRemove: function() {
+            //override
+            return this;
+        },
+        remove: function() {
+            this.beforeRemove();
+            this.hide();
+            this.unbind();
+            return this;
+        },
+        destroy: function() {
+            this.remove();
+            if (this.container) {
+                this.container.remove();
+                this.container = null;
+            }
+        },
+
+        //================================
+        //common api
+        //find child from current container
+        find: function(context, container) {
+            return $(container || this.container).find(context);
+        },
+        contains: function(container, target) {
+            container = $(container).get(0);
+            target = $(target).get(0);
+            //(container, target);
+            if (!container || !target) {
+                return false;
+            }
+            return $.contains(container, target);
+        },
+
+        //class print
+        toString: function() {
+            return "[object ViewBase]";
+        }
+    });
+
+    return ViewBase;
+
+}.call(exports, __webpack_require__, exports, module),
+				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+
+/***/ }),
+/* 2 */
+/***/ (function(module, exports) {
+
+module.exports = "<div class=\"cmp_view\">\r\n\r\n    <div class=\"cmp_info\"></div>\r\n    <div class=\"cmp_list\">\r\n\r\n    </div>\r\n\r\n    <div class=\"cmp_media\">\r\n        <audio class=\"cmp_audio\" src=\"\" autoplay=\"1\" loop=\"0\" preload=\"1\" controls=\"controls\"></audio>\r\n        <video class=\"cmp_video\" src=\"\"></video>\r\n    </div>\r\n\r\n</div>"
+
+/***/ }),
+/* 3 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// style-loader: Adds some css to the DOM by adding a <style> tag
+
+// load the styles
+var content = __webpack_require__(8);
+if(typeof content === 'string') content = [[module.i, content, '']];
+// add the styles to the DOM
+var update = __webpack_require__(12)(content, {});
+if(content.locals) module.exports = content.locals;
+// Hot Module Replacement
+if(false) {
+	// When the styles change, update the <style> tags
+	if(!content.locals) {
+		module.hot.accept("!!../node_modules/css-loader/index.js!./cmp.css", function() {
+			var newContent = require("!!../node_modules/css-loader/index.js!./cmp.css");
+			if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+			update(newContent);
+		});
+	}
+	// When the module is disposed, remove the <style> tags
+	module.hot.dispose(function() { update(); });
+}
+
+/***/ }),
 /* 4 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_RESULT__ = function() {
+    "use strict";
+
+
+    var Util = __webpack_require__(0);
+
+    var ViewBase = __webpack_require__(1);
+
+    var CMPList = ViewBase.extend({
+
+        constructor: function() {
+
+        },
+
+        draw: function(option) {
+            this.option = option;
+            this.container = $(option.container).empty();
+            this.list = option.list;
+
+            var self = this;
+            this.list.forEach(function(item) {
+                self.drawItem(item);
+            });
+
+            this.find(".cmp_list_item").bind("click", function(e) {
+                var $item = $(this);
+                if ($item.hasClass("cmp_list_item")) {
+                    self.itemClickHandler($item);
+                }
+            });
+
+        },
+
+        itemClickHandler: function($item) {
+            var item = $item.data("data");
+            if (!item) {
+                return;
+            }
+            //console.log(item);
+            this.trigger("change", item);
+        },
+
+        drawItem: function(item) {
+            var $item = $("<div/>").data("data", item).addClass("cmp_list_item").appendTo(this.container);
+            $item.html(item.label);
+        },
+
+
+        toString: function() {
+            return "[object CMPList]";
+        }
+
+    });
+
+    return CMPList;
+
+}.call(exports, __webpack_require__, exports, module),
+				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+
+/***/ }),
+/* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_RESULT__ = function() {
@@ -449,18 +625,9 @@ var __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_RESULT__ = function() {
         description: "CMP5 - 『生活需要音乐』 - http://bbs.cenfun.com/",
         logo: "{src:logo.png,xywh:[10R,10R,0,0]}",
 
-        skins: "skins/skin_default.js",
-        plugins: "",
-        backgrounds: "",
-        lists: "",
+        skin: "skins/skin_default.js",
 
-        src_handler: "",
-        lrc_handler: "",
-
-        skin_id: "",
-
-        play_id: "",
-        auto_play: "",
+        autoplay: "1",
 
         counter: "http://img.users.51.la/3389672.asp"
     };
@@ -471,7 +638,7 @@ var __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_RESULT__ = function() {
 				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
 /***/ }),
-/* 5 */
+/* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -592,7 +759,7 @@ function fromByteArray (uint8) {
 
 
 /***/ }),
-/* 6 */
+/* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -606,9 +773,9 @@ function fromByteArray (uint8) {
 
 
 
-var base64 = __webpack_require__(5)
-var ieee754 = __webpack_require__(9)
-var isArray = __webpack_require__(10)
+var base64 = __webpack_require__(6)
+var ieee754 = __webpack_require__(10)
+var isArray = __webpack_require__(11)
 
 exports.Buffer = Buffer
 exports.SlowBuffer = SlowBuffer
@@ -2386,24 +2553,24 @@ function isnan (val) {
   return val !== val // eslint-disable-line no-self-compare
 }
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(13)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(14)))
 
 /***/ }),
-/* 7 */
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
-exports = module.exports = __webpack_require__(8)(undefined);
+exports = module.exports = __webpack_require__(9)(undefined);
 // imports
 
 
 // module
-exports.push([module.i, ".cmp5 {\r\n    position: relative;\r\n}", ""]);
+exports.push([module.i, ".cmp5 {\r\n    position: relative;\r\n}\r\n\r\n.cmp_list {\r\n    position: relative;\r\n}\r\n\r\n.cmp_list_item {\r\n    border-bottom: 1px solid #ccc;\r\n    padding: 5px 5px;\r\n    cursor: pointer;\r\n}\r\n\r\n.cmp_list_item:hover {\r\n    background: #f5f5f5;\r\n}\r\n\r\n.cmp_view {}\r\n\r\n.cmp_media {}\r\n\r\n.cmp_audio {}\r\n\r\n.cmp_video {}", ""]);
 
 // exports
 
 
 /***/ }),
-/* 8 */
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(Buffer) {/*
@@ -2482,10 +2649,10 @@ function toComment(sourceMap) {
   return '/*# ' + data + ' */';
 }
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(6).Buffer))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(7).Buffer))
 
 /***/ }),
-/* 9 */
+/* 10 */
 /***/ (function(module, exports) {
 
 exports.read = function (buffer, offset, isLE, mLen, nBytes) {
@@ -2575,7 +2742,7 @@ exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
 
 
 /***/ }),
-/* 10 */
+/* 11 */
 /***/ (function(module, exports) {
 
 var toString = {}.toString;
@@ -2586,7 +2753,7 @@ module.exports = Array.isArray || function (arr) {
 
 
 /***/ }),
-/* 11 */
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
@@ -2623,7 +2790,7 @@ var stylesInDom = {},
 	singletonElement = null,
 	singletonCounter = 0,
 	styleElementsInsertedAtTop = [],
-	fixUrls = __webpack_require__(12);
+	fixUrls = __webpack_require__(13);
 
 module.exports = function(list, options) {
 	if(typeof DEBUG !== "undefined" && DEBUG) {
@@ -2882,7 +3049,7 @@ function updateLink(linkElement, options, obj) {
 
 
 /***/ }),
-/* 12 */
+/* 13 */
 /***/ (function(module, exports) {
 
 
@@ -2977,7 +3144,7 @@ module.exports = function (css) {
 
 
 /***/ }),
-/* 13 */
+/* 14 */
 /***/ (function(module, exports) {
 
 var g;
@@ -3004,32 +3171,30 @@ module.exports = g;
 
 
 /***/ }),
-/* 14 */
+/* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_RESULT__ = function() {
     "use strict";
 
-    var Util = __webpack_require__(3);
+    __webpack_require__(3);
+    var template = __webpack_require__(2);
 
-    var EventBase = __webpack_require__(2);
+    var Util = __webpack_require__(0);
 
-    var defaultConfig = __webpack_require__(4);
+    var ViewBase = __webpack_require__(1);
 
-    __webpack_require__(1);
-    var template = __webpack_require__(0);
+    var defaultConfig = __webpack_require__(5);
 
-    var CMP = EventBase.extend({
+
+    var CMPList = __webpack_require__(4);
+
+    var CMP = ViewBase.extend({
 
         constructor: function(container) {
             if (arguments.length) {
                 this.setContainer(container);
             }
-        },
-
-        setContainer: function(container) {
-            this.container = $(container).addClass("cmp5");
-            return this;
         },
 
         setConfig: function(config) {
@@ -3044,11 +3209,48 @@ var __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_RESULT__ = function() {
             this.list = list;
         },
 
+        create: function() {
+
+            var self = this;
+
+            this.container.addClass("cmp5").empty();
+
+            this.$view = $(template).appendTo(this.container);
+
+            this.$list = this.find(".cmp_list");
+            this.cmpList = new CMPList();
+            this.cmpList.bind("change", function(e, item) {
+                self.loadItem(item);
+            });
+            this.cmpList.draw({
+                container: this.$list,
+                list: this.list
+            });
+
+            this.$media = this.find(".cmp_media");
+            this.$audio = this.find(".cmp_audio");
+            this.$video = this.find(".cmp_video");
+
+        },
+
+        loadItem: function(item) {
+
+            console.log(item);
+
+            this.$audio.attr("src", item.src);
+
+        },
+
+
         play: function(index) {
 
-            console.log(111);
+            console.log("play ...")
 
-            $(template).appendTo(this.container);
+            if (!this.player) {
+                this.create();
+            }
+
+
 
         },
 
@@ -3071,7 +3273,60 @@ var __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_RESULT__ = function() {
 				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
 /***/ }),
-/* 15 */
+/* 16 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_RESULT__ = function() {
+    "use strict";
+    /**
+     * @build 2011.11.30
+     * @author Kevin Zhu
+     */
+    var $ = window.$;
+    var Extend = __webpack_require__(17);
+    //====================================================================================================
+    /**
+     * @constructor
+     * @returns {EventBase}
+     */
+    var EventBase = Extend.extend({
+        dispatcher: null,
+        getDispatcher: function() {
+            if (!this.dispatcher) {
+                this.dispatcher = $(this);
+            }
+            return this.dispatcher;
+        },
+        bind: function() {
+            var dispatcher = this.getDispatcher();
+            dispatcher.bind.apply(dispatcher, arguments);
+            return this;
+        },
+        one: function() {
+            var dispatcher = this.getDispatcher();
+            dispatcher.one.apply(dispatcher, arguments);
+            return this;
+        },
+        unbind: function() {
+            var dispatcher = this.getDispatcher();
+            dispatcher.unbind.apply(dispatcher, arguments);
+            return this;
+        },
+        trigger: function() {
+            var dispatcher = this.getDispatcher();
+            //use triggerHandler replace trigger to stop default events
+            return dispatcher.triggerHandler.apply(dispatcher, arguments);
+        }
+    });
+
+    return EventBase;
+
+}.call(exports, __webpack_require__, exports, module),
+				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+
+
+/***/ }),
+/* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_RESULT__ = function() {
