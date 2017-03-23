@@ -1,0 +1,25 @@
+.cmp5 {
+    position: relative;
+}
+
+.cmp_list {
+    position: relative;
+}
+
+.cmp_list_item {
+    border-bottom: 1px solid #ccc;
+    padding: 5px 5px;
+    cursor: pointer;
+}
+
+.cmp_list_item:hover {
+    background: #f5f5f5;
+}
+
+.cmp_view {}
+
+.cmp_media {}
+
+.cmp_audio {}
+
+.cmp_video {}
