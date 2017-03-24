@@ -1,9 +1,6 @@
 define(function() {
     "use strict";
-    /**
-     * @build 2016.5.20
-     * @author Kevin Zhu
-     */
+
     var mergeProps = function(target, list) {
         for (var i = 0, l = list.length; i < l; i++) {
             var item = list[i];

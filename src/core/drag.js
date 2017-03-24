@@ -14,7 +14,7 @@ define(function() {
     };
     var Util = require("./util.js");
 
-    var EventBase = require("./event-base.js");
+    var EventBase = require("./event.base.js");
 
     //====================================================================================================
     /**

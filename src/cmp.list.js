@@ -4,7 +4,7 @@ define(function() {
 
     var Util = require("./core/util.js");
 
-    var ViewBase = require("./core/view-base.js");
+    var ViewBase = require("./core/view.base.js");
 
     var CMPList = ViewBase.extend({
 

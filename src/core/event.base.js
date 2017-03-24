@@ -1,16 +1,6 @@
 define(function() {
     "use strict";
-    /**
-     * @build 2011.11.30
-     * @author Kevin Zhu
-     */
-    var $ = window.$;
     var Extend = require("./extend.js");
-    //====================================================================================================
-    /**
-     * @constructor
-     * @returns {EventBase}
-     */
     var EventBase = Extend.extend({
         dispatcher: null,
         getDispatcher: function() {
@@ -36,11 +26,9 @@ define(function() {
         },
         trigger: function() {
             var dispatcher = this.getDispatcher();
-            //use triggerHandler replace trigger to stop default events
             return dispatcher.triggerHandler.apply(dispatcher, arguments);
         }
     });
-
     return EventBase;
 
 });
