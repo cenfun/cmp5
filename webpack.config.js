@@ -1,4 +1,6 @@
 var path = require("path");
+
+//https://webpack.js.org/configuration/
 module.exports = {
     entry: "./src/cmp.js",
     output: {
@@ -7,6 +9,7 @@ module.exports = {
         libraryTarget: "umd",
         umdNamedDefine: true
     },
+    externals: ["jquery"],
     module: {
         loaders: [{
             test: /^.*\.css$/,

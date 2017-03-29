@@ -1,7 +1,7 @@
 define(function() {
     'use strict';
 
-    var EventBase = require("./event-base.js");
+    var EventBase = require("./event.base.js");
 
     var ViewBase = EventBase.extend({
 

@@ -520,7 +520,7 @@ var __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_RESULT__ = function() {
 /* 2 */
 /***/ (function(module, exports) {
 
-module.exports = "<div class=\"cmp_view\">\r\n\r\n    <div class=\"cmp_info\"></div>\r\n    <div class=\"cmp_list\">\r\n\r\n    </div>\r\n\r\n    <div class=\"cmp_media\">\r\n        <audio class=\"cmp_audio\" src=\"\" autoplay=\"1\" loop=\"0\" preload=\"1\" controls=\"controls\"></audio>\r\n        <video class=\"cmp_video\" src=\"\"></video>\r\n    </div>\r\n\r\n</div>"
+module.exports = "<div class=\"cmp_header\">\r\n    <div class=\"cmp_title\"></div>\r\n</div>\r\n\r\n<div class=\"cmp_bodyer\">\r\n    <div class=\"cmp_view_list\">\r\n\r\n        <div class=\"cmp_view_item selected\">\r\n            <div class=\"cmp_list\"></div>\r\n        </div>\r\n\r\n        <div class=\"cmp_view_item\">\r\n            <div class=\"cmp_media\">\r\n                <video class=\"cmp_video\" src=\"\"></video>\r\n            </div>\r\n        </div>\r\n\r\n        <div class=\"cmp_view_item\">\r\n            <div class=\"cmp_lrc\"></div>\r\n        </div>\r\n\r\n    </div>\r\n\r\n</div>\r\n\r\n\r\n<div class=\"cmp_footer\">\r\n    <div class=\"cmp_control\">\r\n        <audio class=\"cmp_audio\"></audio>\r\n    </div>\r\n</div>"
 
 /***/ }),
 /* 3 */
@@ -570,10 +570,11 @@ var __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_RESULT__ = function() {
             this.option = option;
             this.container = $(option.container).empty();
             this.list = option.list;
+            this.index = -1;
 
             var self = this;
-            this.list.forEach(function(item) {
-                self.drawItem(item);
+            this.list.forEach(function(item, index) {
+                self.drawItem(item, index);
             });
 
             this.find(".cmp_list_item").bind("click", function(e) {
@@ -586,16 +587,32 @@ var __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_RESULT__ = function() {
         },
 
         itemClickHandler: function($item) {
-            var item = $item.data("data");
+            var index = $item.attr("data");
+            this.indexHandler(index);
+        },
+
+        next: function() {
+            var index = Util.tonum(this.index) + 1;
+            if (index > this.list.length - 1) {
+                index = 0;
+            }
+            index = Util.clamp(index, 0, this.list.length - 1);
+            this.indexHandler(index);
+        },
+
+        indexHandler: function(index) {
+            var item = this.list[index];
             if (!item) {
                 return;
             }
-            //console.log(item);
+            this.find(".cmp_list_item").removeClass("selected");
+            this.find(".cmp_list_item[data='" + index + "']").addClass("selected");
+            this.index = index;
             this.trigger("change", item);
         },
 
-        drawItem: function(item) {
-            var $item = $("<div/>").data("data", item).addClass("cmp_list_item").appendTo(this.container);
+        drawItem: function(item, index) {
+            var $item = $("<div/>").attr("data", index).addClass("cmp_list_item").appendTo(this.container);
             $item.html(item.label);
         },
 
@@ -2564,7 +2581,7 @@ exports = module.exports = __webpack_require__(9)(undefined);
 
 
 // module
-exports.push([module.i, ".cmp5 {\r\n    position: relative;\r\n}\r\n\r\n.cmp_list {\r\n    position: relative;\r\n}\r\n\r\n.cmp_list_item {\r\n    border-bottom: 1px solid #ccc;\r\n    padding: 5px 5px;\r\n    cursor: pointer;\r\n}\r\n\r\n.cmp_list_item:hover {\r\n    background: #f5f5f5;\r\n}\r\n\r\n.cmp_view {}\r\n\r\n.cmp_media {}\r\n\r\n.cmp_audio {}\r\n\r\n.cmp_video {}", ""]);
+exports.push([module.i, ".cmp5 {\r\n    position: relative;\r\n}\r\n\r\n.cmp_header {\r\n    height: 20%;\r\n}\r\n\r\n.cmp_bodyer {\r\n    height: 60%;\r\n}\r\n\r\n.cmp_footer {\r\n    height: 20%;\r\n}\r\n\r\n\r\n/*\r\n==================================================\r\nview\r\n*/\r\n\r\n.cmp_view_list {\r\n    position: relative;\r\n    width: 100%;\r\n    height: 100%;\r\n}\r\n\r\n.cmp_view_item {\r\n    position: absolute;\r\n    top: 0px;\r\n    left: 0px;\r\n    width: 100%;\r\n    height: 100%;\r\n    overflow: hidden;\r\n    display: none;\r\n}\r\n\r\n.cmp_view_item.selected {\r\n    display: block;\r\n}\r\n\r\n\r\n/*\r\n==================================================\r\ncmp_list\r\n*/\r\n\r\n.cmp_list {\r\n    position: relative;\r\n}\r\n\r\n.cmp_list_item {\r\n    border-bottom: 1px solid #ccc;\r\n    padding: 5px 5px;\r\n    cursor: pointer;\r\n}\r\n\r\n.cmp_list_item:hover {\r\n    background: #f5f5f5;\r\n}\r\n\r\n.cmp_list_item.selected {\r\n    background: #aaaaaa;\r\n}\r\n\r\n\r\n/*\r\n==================================================\r\ncmp_control\r\n*/\r\n\r\n.cmp_control {\r\n    position: fixed;\r\n    bottom: 0px;\r\n}\r\n\r\n.cmp_audio {}", ""]);
 
 // exports
 
@@ -3215,7 +3232,9 @@ var __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_RESULT__ = function() {
 
             this.container.addClass("cmp5").empty();
 
-            this.$view = $(template).appendTo(this.container);
+            $(template).appendTo(this.container);
+
+            this.showTitle();
 
             this.$list = this.find(".cmp_list");
             this.cmpList = new CMPList();
@@ -3227,17 +3246,40 @@ var __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_RESULT__ = function() {
                 list: this.list
             });
 
-            this.$media = this.find(".cmp_media");
+
             this.$audio = this.find(".cmp_audio");
+            this.audio = this.$audio.get(0);
+            this.audio.autoplay = false;
+            this.audio.loop = false;
+            this.audio.preload = true;
+            this.audio.controls = true;
+
+            this.$audio.bind("timeupdate", function(e) {
+                //console.log(e.timeStamp);
+            });
+            this.$audio.bind("ended", function(e) {
+                self.cmpList.next();
+            });
+            this.$audio.bind("error", function(e) {
+                self.cmpList.next();
+            });
+
             this.$video = this.find(".cmp_video");
 
         },
 
         loadItem: function(item) {
 
-            console.log(item);
+            //console.log(item);
 
-            this.$audio.attr("src", item.src);
+            this.showTitle(item.label);
+
+            try {
+                this.audio.src = item.src;
+            } catch (e) {
+
+            }
+            this.audio.play();
 
         },
 
@@ -3250,8 +3292,15 @@ var __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_RESULT__ = function() {
                 this.create();
             }
 
+        },
 
+        showTitle: function(title) {
 
+            if (!title) {
+                title = this.config.name;
+            }
+
+            this.find(".cmp_title").html(title);
         },
 
         toString: function() {
@@ -3278,17 +3327,7 @@ var __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_RESULT__ = function() {
 
 var __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_RESULT__ = function() {
     "use strict";
-    /**
-     * @build 2011.11.30
-     * @author Kevin Zhu
-     */
-    var $ = window.$;
     var Extend = __webpack_require__(17);
-    //====================================================================================================
-    /**
-     * @constructor
-     * @returns {EventBase}
-     */
     var EventBase = Extend.extend({
         dispatcher: null,
         getDispatcher: function() {
@@ -3314,16 +3353,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_RESULT__ = function() {
         },
         trigger: function() {
             var dispatcher = this.getDispatcher();
-            //use triggerHandler replace trigger to stop default events
             return dispatcher.triggerHandler.apply(dispatcher, arguments);
         }
     });
-
     return EventBase;
 
 }.call(exports, __webpack_require__, exports, module),
 				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
-
 
 /***/ }),
 /* 17 */
@@ -3331,10 +3367,7 @@ var __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_RESULT__ = function() {
 
 var __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_RESULT__ = function() {
     "use strict";
-    /**
-     * @build 2016.5.20
-     * @author Kevin Zhu
-     */
+
     var mergeProps = function(target, list) {
         for (var i = 0, l = list.length; i < l; i++) {
             var item = list[i];
@@ -3389,7 +3422,6 @@ var __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_RESULT__ = function() {
 
 }.call(exports, __webpack_require__, exports, module),
 				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
-
 
 /***/ })
 /******/ ]);

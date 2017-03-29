@@ -6,12 +6,12 @@ define(function() {
 
     var Util = require("./core/util.js");
 
-    var ViewBase = require("./core/view-base.js");
+    var ViewBase = require("./core/view.base.js");
 
-    var defaultConfig = require("./default-config.js");
+    var defaultConfig = require("./default.config.js");
 
 
-    var CMPList = require("./cmp-list.js");
+    var CMPList = require("./cmp.list.js");
 
     var CMP = ViewBase.extend({
 
@@ -39,7 +39,9 @@ define(function() {
 
             this.container.addClass("cmp5").empty();
 
-            this.$view = $(template).appendTo(this.container);
+            $(template).appendTo(this.container);
+
+            this.showTitle();
 
             this.$list = this.find(".cmp_list");
             this.cmpList = new CMPList();
@@ -51,17 +53,40 @@ define(function() {
                 list: this.list
             });
 
-            this.$media = this.find(".cmp_media");
+
             this.$audio = this.find(".cmp_audio");
+            this.audio = this.$audio.get(0);
+            this.audio.autoplay = false;
+            this.audio.loop = false;
+            this.audio.preload = true;
+            this.audio.controls = true;
+
+            this.$audio.bind("timeupdate", function(e) {
+                //console.log(e.timeStamp);
+            });
+            this.$audio.bind("ended", function(e) {
+                self.cmpList.next();
+            });
+            this.$audio.bind("error", function(e) {
+                self.cmpList.next();
+            });
+
             this.$video = this.find(".cmp_video");
 
         },
 
         loadItem: function(item) {
 
-            console.log(item);
+            //console.log(item);
 
-            this.$audio.attr("src", item.src);
+            this.showTitle(item.label);
+
+            try {
+                this.audio.src = item.src;
+            } catch (e) {
+
+            }
+            this.audio.play();
 
         },
 
@@ -74,8 +99,15 @@ define(function() {
                 this.create();
             }
 
+        },
 
+        showTitle: function(title) {
 
+            if (!title) {
+                title = this.config.name;
+            }
+
+            this.find(".cmp_title").html(title);
         },
 
         toString: function() {
