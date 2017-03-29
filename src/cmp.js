@@ -56,6 +56,20 @@ define(function() {
 
             this.$audio = this.find(".cmp_audio");
             this.audio = this.$audio.get(0);
+            this.audio.autoplay = false;
+            this.audio.loop = false;
+            this.audio.preload = true;
+            this.audio.controls = true;
+
+            this.$audio.bind("timeupdate", function(e) {
+                //console.log(e.timeStamp);
+            });
+            this.$audio.bind("ended", function(e) {
+                self.cmpList.next();
+            });
+            this.$audio.bind("error", function(e) {
+                self.cmpList.next();
+            });
 
             this.$video = this.find(".cmp_video");
 
@@ -63,11 +77,16 @@ define(function() {
 
         loadItem: function(item) {
 
-            console.log(item);
+            //console.log(item);
 
             this.showTitle(item.label);
 
-            this.audio.src = item.src;
+            try {
+                this.audio.src = item.src;
+            } catch (e) {
+
+            }
+            this.audio.play();
 
         },
 

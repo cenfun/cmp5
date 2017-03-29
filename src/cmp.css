@@ -60,6 +60,10 @@ cmp_list
     background: #f5f5f5;
 }
 
+.cmp_list_item.selected {
+    background: #aaaaaa;
+}
+
 
 /*
 ==================================================
