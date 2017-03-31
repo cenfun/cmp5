@@ -1,17 +1,21 @@
 define(function() {
     "use strict";
 
-    require("./cmp.css");
+    require("./skin/base.css");
+    require("./skin/layout.css");
+
     var template = require("./cmp.html");
+
+    var Loading = require("./ui/loading/loading.js");
 
     var Util = require("./core/util.js");
 
     var ViewBase = require("./core/view.base.js");
 
-    var defaultConfig = require("./default.config.js");
+    var defaultConfig = require("./config/config.js");
 
 
-    var CMPList = require("./cmp.list.js");
+    var CMPList = require("./list/list.js");
 
     var CMP = ViewBase.extend({
 
@@ -37,9 +41,14 @@ define(function() {
 
             var self = this;
 
-            this.container.addClass("cmp5").empty();
+            this.uid = "cmp_" + Util.token(8);
+
+            this.container.addClass("cmp " + this.uid).empty();
 
             $(template).appendTo(this.container);
+
+            this.loading = new Loading();
+            this.loading.setContainer(this.container);
 
             this.showTitle();
 
@@ -52,7 +61,6 @@ define(function() {
                 container: this.$list,
                 list: this.list
             });
-
 
             this.$audio = this.find(".cmp_audio");
             this.audio = this.$audio.get(0);
@@ -73,6 +81,7 @@ define(function() {
 
             this.$video = this.find(".cmp_video");
 
+
         },
 
         loadItem: function(item) {
@@ -92,8 +101,6 @@ define(function() {
 
 
         play: function(index) {
-
-            console.log("play ...")
 
             if (!this.player) {
                 this.create();
