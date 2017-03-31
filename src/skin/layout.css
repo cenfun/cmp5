@@ -1,17 +1,39 @@
-.cmp5 {
+@charset "utf-8";
+
+/*
+==================================================
+cmp
+*/
+
+.cmp {
     position: relative;
 }
 
 .cmp_header {
-    height: 20%;
+    height: 50px;
+    border-bottom: 1px solid #999;
 }
 
-.cmp_bodyer {
-    height: 60%;
+.cmp_title {
+    padding: 0px 10px;
+    line-height: 50px;
 }
 
 .cmp_footer {
-    height: 20%;
+    position: fixed;
+    border-top: 1px solid #999;
+    left: 0px;
+    right: 0px;
+    bottom: 0px;
+    height: 50px;
+}
+
+.cmp_bodyer {
+    position: absolute;
+    top: 50px;
+    left: 0px;
+    right: 0px;
+    bottom: 50px;
 }
 
 

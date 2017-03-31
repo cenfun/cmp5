@@ -27,12 +27,12 @@
         type: "",
         src: "music/test.mp3",
         lrc: "lrc/lrc.txt",
-        label: "1,MP3音乐测试"
+        label: "MP3音乐测试"
     }, {
         type: "",
         src: "music/test.mp4",
         lrc: "",
-        label: "2,mp4视频测试"
+        label: "mp4视频测试"
     }, {
         type: "",
         src: "music/test.mp3",
