@@ -15,7 +15,7 @@
     "type": "git",
     "url": "git://github.com/cenfun/cmp5.git"
   },
-  "main": "cmp5.js",
+  "main": "build/cmp5.js",
   "dependencies": {},
   "devDependencies": {
     "browser-sync": "^2.18.8",

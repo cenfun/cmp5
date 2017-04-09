@@ -7,11 +7,10 @@ var gutil = require("gulp-util");
 
 var webpack = require("webpack");
 var webpackConfig = require("./webpack.config.js");
-var wiredep = require("wiredep");
 var browserSync = require('browser-sync').create("my_demo_server");
 
 
-gulp.task('default', ['build', "wiredep", 'preview', 'watch']);
+gulp.task('default', ['build', 'preview', 'watch']);
 
 
 gulp.task("build", function() {
@@ -21,24 +20,6 @@ gulp.task("build", function() {
     var myConfig = Object.create(webpackConfig);
     myConfig.output.filename = "cmp5.js";
     myConfig.devtool = "#source-map";
-    // run webpack
-    webpack(myConfig, function(err, stats) {
-        if (err) {
-            throw new gutil.PluginError("build", err);
-        }
-        browserSync.reload();
-    });
-
-});
-
-gulp.task("min", function() {
-
-    browserSync.notify("minify building ...");
-
-    var myConfig = Object.create(webpackConfig);
-
-    //add.min for filename
-    myConfig.output.filename = "cmp5.min.js";
 
     myConfig.plugins = [
         new webpack.optimize.UglifyJsPlugin({
@@ -51,14 +32,16 @@ gulp.task("min", function() {
             }
         })
     ];
+
     // run webpack
     webpack(myConfig, function(err, stats) {
         if (err) {
             throw new gutil.PluginError("build", err);
         }
+        browserSync.reload();
     });
-});
 
+});
 
 gulp.task("preview", function() {
     //https://www.npmjs.com/package/browser-sync
@@ -69,7 +52,7 @@ gulp.task("preview", function() {
             port: 8081
         },
         //proxy: ""
-        server: ["./demo", "./build", "./bower_components"]
+        server: ["./demo", "./build"]
     });
 
 });
@@ -78,45 +61,5 @@ gulp.task('watch', function() {
     gulp.watch(["./src/**/*"], ['build']);
     gulp.watch(["./demo/**/*", "./build/**/*"]).on('change', function() {
         browserSync.reload();
-    });
-});
-
-
-gulp.task("wiredep", function() {
-
-    //https://www.npmjs.com/package/wiredep
-    wiredep({
-
-        src: './demo/index.html',
-
-        //cwd: "./",
-
-        // default: '.bowerrc'.directory || bower_components 
-        //directory: 'bower_components',
-        // default: require('./bower.json') 
-        //bowerJson: 'bower.json',
-
-        dependencies: true,
-        devDependencies: true,
-        includeSelf: true,
-        exclude: [],
-
-        ignorePath: /\.\.\/.+?\//,
-
-        fileTypes: {
-            html: {
-                block: /(([ \t]*)<!--\s*bower:*(\S*)\s*-->)(\n|\r|.)*?(<!--\s*endbower\s*-->)/gi,
-                detect: {
-                    js: /<script.*src=['"]([^'"]+)/gi,
-                    css: /<link.*href=['"]([^'"]+)/gi
-                },
-                replace: {
-                    js: '<script src="{{filePath}}"></script>',
-                    css: '<link rel="stylesheet" href="{{filePath}}" />'
-                }
-            }
-
-        }
-
     });
 });
