@@ -45,11 +45,14 @@
         label: "kmc卡拉OK歌词"
     }];
 
+    //将build目录下的cmp5.js拷贝到demo目录
     var cmp5 = window.cmp5;
-    var cmp = new cmp5.CMP();
-    cmp.setContainer(".container");
-    cmp.setConfig(config);
-    cmp.setList(list);
-    cmp.play();
+    if (cmp5) {
+        var cmp = new cmp5.CMP();
+        cmp.setContainer(".container");
+        cmp.setConfig(config);
+        cmp.setList(list);
+        cmp.play();
+    }
 
 }());
