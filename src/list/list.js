@@ -11,26 +11,28 @@ class CMPList extends ViewBase {
 
     draw(option) {
         this.option = option;
+        var self = this;
+
         this.container = $(option.container).empty();
+        this.container.delegate(".cmp_list_item", "click", function(e) {
+            var $item = $(e.target);
+            self.itemClickHandler($item);
+        });
+
         this.list = option.list;
         this.index = -1;
 
-        var self = this;
         this.list.forEach(function(item, index) {
             self.drawItem(item, index);
         });
 
-        this.find(".cmp_list_item").bind("click", function(e) {
-            var $item = $(this);
-            if ($item.hasClass("cmp_list_item")) {
-                self.itemClickHandler($item);
-            }
-        });
+        this.trigger("ready");
 
     }
 
     itemClickHandler($item) {
         var index = $item.attr("data");
+        //console.log(index);
         this.indexHandler(index);
     }
 

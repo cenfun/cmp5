@@ -14,6 +14,7 @@ var ViewBase = require("../core/view-base.js");
 var defaultConfig = require("../config/config.js");
 
 var CMPList = require("../list/list.js");
+var CMPMixer = require("../mixer/mixer.js");
 
 class CMP extends ViewBase {
 
@@ -38,8 +39,6 @@ class CMP extends ViewBase {
 
     create() {
 
-        var self = this;
-
         this.uid = "cmp_" + Util.token(8);
 
         this.container.addClass("cmp " + this.uid).empty();
@@ -51,16 +50,17 @@ class CMP extends ViewBase {
 
         this.showTitle();
 
-        this.$list = this.find(".cmp_list");
-        this.cmpList = new CMPList();
-        this.cmpList.bind("change", function(e, item) {
-            self.loadItem(item);
-        });
-        this.cmpList.draw({
-            container: this.$list,
-            list: this.list
-        });
+        this.createAudio();
 
+        this.createVideo();
+
+        this.createMixer();
+
+        this.createList();
+
+    }
+
+    createAudio() {
         this.$audio = this.find(".cmp_audio");
         this.audio = this.$audio.get(0);
         this.audio.autoplay = false;
@@ -68,6 +68,7 @@ class CMP extends ViewBase {
         this.audio.preload = true;
         this.audio.controls = true;
 
+        var self = this;
         this.$audio.bind("timeupdate", function(e) {
             //console.log(e.timeStamp);
         });
@@ -75,12 +76,41 @@ class CMP extends ViewBase {
             self.cmpList.next();
         });
         this.$audio.bind("error", function(e) {
-            self.cmpList.next();
+            self.loadItemError();
         });
 
+    }
+
+    createVideo() {
         this.$video = this.find(".cmp_video");
+    }
 
+    createMixer() {
+        this.$mixer = this.find(".cmp_mixer");
+        this.mixer = new CMPMixer();
+        this.mixer.draw({
+            container: this.$mixer,
+            audio: this.audio
+        });
+    }
 
+    createList() {
+        this.$list = this.find(".cmp_list");
+        this.cmpList = new CMPList();
+
+        var self = this;
+        this.cmpList.bind("change", function(e, item) {
+            self.loadItem(item);
+        });
+        this.cmpList.bind("ready", function() {
+            if (self.config.autoplay) {
+                self.cmpList.next();
+            }
+        });
+        this.cmpList.draw({
+            container: this.$list,
+            list: this.list
+        });
     }
 
     loadItem(item) {
@@ -92,11 +122,18 @@ class CMP extends ViewBase {
         try {
             this.audio.src = item.src;
         } catch (e) {
-            this.cmpList.next();
+            this.loadItemError();
             return;
         }
         this.audio.play();
 
+    }
+
+    loadItemError() {
+        var self = this;
+        setTimeout(function() {
+            self.cmpList.next();
+        }, 1000);
     }
 
     play(index) {

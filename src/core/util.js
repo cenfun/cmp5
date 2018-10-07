@@ -94,7 +94,7 @@ var Util = {
             return str;
         }
 
-        str = str.replace(/\{([^\}]+)\}/g, function(match, key) {
+        str = str.replace(/\{([^}]+)\}/g, function(match, key) {
 
             if (!obj.hasOwnProperty(key)) {
                 return match;
@@ -255,6 +255,26 @@ var Util = {
             return true;
         }
 
+        return false;
+    },
+
+    contains: function(container, target) {
+        if (!container || !target) {
+            return false;
+        }
+        if (container === target) {
+            return true;
+        }
+        if (container.contains) {
+            return container.contains(target);
+        }
+        var parent = target.parentNode;
+        while (parent) {
+            if (parent === container) {
+                return true;
+            }
+            parent = parent.parentNode;
+        }
         return false;
     }
 

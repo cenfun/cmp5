@@ -18,31 +18,29 @@
         skin_id: "",
 
         play_id: "",
-        auto_play: "",
+
+        autoplay: true,
 
         counter: "http://img.users.51.la/3389672.asp"
     };
 
     var list = [{
         type: "",
-        src: "music/test.mp3",
-        lrc: "lrc/lrc.txt",
+        src: "http://cmp.cenfun.com/cmp4/music/test.mp3",
         label: "MP3音乐测试"
     }, {
         type: "",
-        src: "music/test.mp4",
-        lrc: "",
+        src: "http://cmp.cenfun.com/cmp4/music/test.mp4",
         label: "mp4视频测试"
     }, {
         type: "",
-        src: "music/test.mp3",
+        src: "http://cmp.cenfun.com/cmp4/music/J.Fla - Delicate.mp3",
         lrc: "lrc/lrc.txt",
-        label: "lrc歌词"
+        label: "J.Fla - Delicate"
     }, {
         type: "",
-        src: "music/test.mp4",
-        lrc: "lrc/kmc.json",
-        label: "kmc卡拉OK歌词"
+        src: "http://cmp.cenfun.com/cmp4/music/J.Fla - Let Me Love You+Faded.mp3",
+        label: "J.Fla - Let Me Love You+Faded"
     }];
 
     //将build目录下的cmp5.js拷贝到demo目录
