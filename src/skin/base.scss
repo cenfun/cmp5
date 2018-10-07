@@ -1,0 +1,75 @@
+@charset "utf-8";
+.cmp * {
+    box-sizing: border-box;
+}
+
+
+/* clearfix */
+
+.cmp .floatlt {
+    float: left;
+}
+
+.cmp .floatrt {
+    float: right;
+}
+
+.cmp .clearfix:after {
+    content: ' ';
+    clear: both;
+    display: block;
+    font-size: 0;
+    line-height: 0;
+    width: 0;
+    height: 0;
+    visibility: hidden;
+}
+
+.cmp .clearfix {
+    display: block;
+}
+
+
+/* global class */
+
+.cmp .break {
+    overflow: hidden;
+    word-wrap: break-word;
+    word-break: break-all;
+}
+
+.cmp .ellipsis {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+
+/* position layout */
+
+.cmp .poslt {
+    position: absolute;
+    left: 0;
+}
+
+.cmp .posrt {
+    position: absolute;
+    right: 0;
+}
+
+.cmp .postp {
+    position: absolute;
+    top: 0;
+}
+
+.cmp .posbt {
+    position: absolute;
+    bottom: 0;
+}
+
+.cmp .poscc {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}

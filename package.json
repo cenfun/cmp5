@@ -1,6 +1,6 @@
 {
     "name": "cmp5",
-    "version": "0.0.1",
+    "version": "5.0.1",
     "description": "CMP5",
     "license": "MIT",
     "homepage": "http://www.cenfun.com",
@@ -15,19 +15,24 @@
         "type": "git",
         "url": "git://github.com/cenfun/cmp5.git"
     },
-    "main": "build/cmp5.js",
+    "main": "dist/cmp5.js",
     "dependencies": {},
     "devDependencies": {
+        "@babel/core": "^7.0.0",
+        "@babel/preset-env": "^7.0.0",
+        "babel-loader": "^8.0.2",
         "browser-sync": "^2.18.8",
-        "css-loader": "^0.27.3",
-        "file-loader": "^0.11.0",
-        "gulp": "^3.9.1",
-        "gulp-util": "^3.0.8",
-        "html-loader": "^0.4.5",
-        "json-loader": "^0.5.4",
+        "css-loader": "^1.0.0",
+        "html-loader": "^0.5.5",
+        "node-sass": "^4.9.3",
         "raw-loader": "^0.5.1",
-        "style-loader": "^0.16.0",
-        "url-loader": "^0.5.8",
-        "webpack": "^2.3.0"
+        "sass-loader": "^7.1.0",
+        "style-loader": "^0.23.0",
+        "url-loader": "^1.1.1",
+        "webpack": "^4.17.2"
+    },
+    "scripts": {
+        "build": "node ./scripts/build.js",
+        "preview": "node ./scripts/preview.js"
     }
 }
