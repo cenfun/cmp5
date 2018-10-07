@@ -92,7 +92,8 @@ class CMP extends ViewBase {
         try {
             this.audio.src = item.src;
         } catch (e) {
-
+            this.cmpList.next();
+            return;
         }
         this.audio.play();
 

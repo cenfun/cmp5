@@ -95,6 +95,7 @@ var CLI = {
                 files: ["./demo/**/*", "./dist/*", {
                     match: ["./src/**/*"],
                     fn: function(event, file) {
+                        console.log(event, file);
                         CLI.pack();
                     }
                 }],

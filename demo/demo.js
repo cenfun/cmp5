@@ -40,7 +40,7 @@
         label: "lrc歌词"
     }, {
         type: "",
-        src: "music/test.mp3",
+        src: "music/test.mp4",
         lrc: "lrc/kmc.json",
         label: "kmc卡拉OK歌词"
     }];
