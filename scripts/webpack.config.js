@@ -9,6 +9,7 @@ module.exports = {
 
             output: {
                 path: path.resolve(__dirname, "../dist/"),
+                filename: "cmp5.js",
                 library: "cmp5",
                 libraryTarget: "umd",
                 umdNamedDefine: true
