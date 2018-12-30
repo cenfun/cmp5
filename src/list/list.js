@@ -14,7 +14,7 @@ class CMPList extends ViewBase {
         var self = this;
 
         this.container = $(option.container).empty();
-        this.container.delegate(".cmp_list_item", "click", function(e) {
+        this.container.delegate(".cmp-list-item", "click", function(e) {
             var $item = $(e.target);
             self.itemClickHandler($item);
         });
@@ -50,14 +50,14 @@ class CMPList extends ViewBase {
         if (!item) {
             return;
         }
-        this.find(".cmp_list_item").removeClass("selected");
-        this.find(".cmp_list_item[data='" + index + "']").addClass("selected");
+        this.find(".cmp-list-item").removeClass("selected");
+        this.find(".cmp-list-item[data='" + index + "']").addClass("selected");
         this.index = index;
         this.trigger("change", item);
     }
 
     drawItem(item, index) {
-        var $item = $("<div/>").attr("data", index).addClass("cmp_list_item").appendTo(this.container);
+        var $item = $("<div/>").attr("data", index).addClass("cmp-list-item").appendTo(this.container);
         $item.html(item.label);
     }
 

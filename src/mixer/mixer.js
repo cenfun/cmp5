@@ -1,4 +1,4 @@
-var Util = require("../core/util.js");
+//var Util = require("../core/util.js");
 var $ = require("../core/query.js");
 
 var ViewBase = require("../core/view-base.js");
@@ -14,6 +14,7 @@ class CMPMixer extends ViewBase {
         this.option = option;
         this.container = $(option.container);
 
+        //https://developer.mozilla.org/zh-CN/docs/Web/API/AudioContext
         this.AudioContext = window.AudioContext || window.webkitAudioContext || window.mozAudioContext || window.msAudioContext;
         try {
             this.audioContext = new this.AudioContext();
@@ -27,81 +28,78 @@ class CMPMixer extends ViewBase {
     }
 
     createAnalyser() {
+        //https://developer.mozilla.org/en-US/docs/Web/API/BaseAudioContext/createAnalyser
         var analyser = this.audioContext.createAnalyser();
-
         console.log(analyser);
 
+        //https://developer.mozilla.org/zh-CN/docs/Web/API/AudioContext/createMediaElementSource
         var source = this.audioContext.createMediaElementSource(this.option.audio);
-
         source.connect(analyser);
-
         analyser.connect(this.audioContext.destination);
 
-        // we could configure the analyser: e.g. analyser.fftSize (for further infos read the spec)
-        // analyser.fftSize = 64;
-        // frequencyBinCount tells you how many values you'll receive from the analyser
-
-        //var frequencyData = new Uint8Array(analyser.frequencyBinCount);
 
         this.canvas = this.find("canvas").get(0);
-
         this.ctx = this.canvas.getContext('2d');
 
-        this.gradient = this.ctx.createLinearGradient(0, 0, 0, 300);
-        this.gradient.addColorStop(1, '#0f0');
-        this.gradient.addColorStop(0.5, '#ff0');
-        this.gradient.addColorStop(0, '#f00');
+        this.resize();
 
         this.drawMixer(analyser);
     }
 
     drawMixer(analyser) {
 
-        var cwidth = this.canvas.width;
-        var cheight = this.canvas.height - 2;
+        var cw = this.canvas.width;
+        var ch = this.canvas.height;
 
-        var meterWidth = 10;
-        var capHeight = 2;
-        var capStyle = '#fff';
-        var meterNum = 800 / (10 + 2);
-        var capYPositionArray = [];
+        //analyser.fftSize = 2048;
+        //analyser.smoothingTimeConstant = 0.95;
 
-        var array = new Uint8Array(analyser.frequencyBinCount);
-        analyser.getByteFrequencyData(array);
+        //analyser.minDecibels = -100;
+        //analyser.maxDecibels = -30;
 
-        //console.log(1);
+        var array = new Float32Array(analyser.fftSize);
+        analyser.getFloatTimeDomainData(array);
 
 
-        var step = Math.round(array.length / meterNum);
-        this.ctx.clearRect(0, 0, cwidth, cheight);
+        var hh = ch * 0.5;
+        var l = array.length;
+        var offset = cw / l;
 
-        for (var i = 0; i < meterNum; i++) {
-            var value = array[i * step];
-            if (capYPositionArray.length < Math.round(meterNum)) {
-                capYPositionArray.push(value);
-            }
-            this.ctx.fillStyle = capStyle;
-            //draw the cap, with transition effect
-            if (value < capYPositionArray[i]) {
-                this.ctx.fillRect(i * 12, cheight - (--capYPositionArray[i]), meterWidth, capHeight);
-            } else {
-                this.ctx.fillRect(i * 12, cheight - value, meterWidth, capHeight);
-                capYPositionArray[i] = value;
-            }
-            this.ctx.fillStyle = this.gradient;
+        //if (Math.random() > 0.99) {
+        //console.log(analyser.fftSize, l);
+        //console.log(Math.min.apply(null, array), Math.max.apply(null, array));
+        //console.log(array);
+        //}
 
-            this.ctx.fillRect(i * 12, cheight - value + capHeight, meterWidth, cheight);
+        this.ctx.clearRect(0, 0, cw, ch);
+        this.ctx.strokeStyle = '#00ff00';
+        this.ctx.lineWidth = 2;
+        this.ctx.lineJoin = "round";
+        this.ctx.beginPath();
+        this.ctx.moveTo(0, hh);
+
+        for (var i = 0; i < l; i++) {
+            var item = array[i];
+            this.ctx.lineTo(i * offset, hh + hh * 0.6 * item);
         }
+
+        this.ctx.stroke();
+
 
         var self = this;
         requestAnimationFrame(function() {
             self.drawMixer(analyser);
         });
 
-
     }
 
+    resize() {
+        this.width = this.container.width();
+        this.height = this.container.height();
 
+        this.canvas.setAttribute("width", this.width + "px");
+        this.canvas.setAttribute("height", this.height + "px");
+    }
 
     toString() {
         return "[object CMPMixer]";

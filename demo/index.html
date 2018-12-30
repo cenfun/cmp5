@@ -61,6 +61,9 @@
             src: "music/test.mp4",
             label: "mp4视频测试"
         }, {
+            src: "music/Rihanna - Love On The Brain.mp3",
+            label: "Rihanna - Love On The Brain"
+        }, {
             type: "",
             src: "music/J.Fla - Delicate.mp3",
             lrc: "lrc/lrc.txt",
@@ -71,15 +74,23 @@
             label: "J.Fla - Let Me Love You+Faded"
         }];
 
-        //将build目录下的cmp5.js拷贝到demo目录
         var cmp5 = window.cmp5;
-        if (cmp5) {
-            var cmp = new cmp5.CMP();
+        var cmp = new cmp5.CMP();
+
+        //将build目录下的cmp5.js拷贝到demo目录
+        window.addEventListener("load", function() {
+
             cmp.setContainer(".cmp_container");
             cmp.setConfig(config);
             cmp.setList(list);
             cmp.play();
-        }
+
+            window.addEventListener("resize", function() {
+                cmp.resize();
+            });
+        });
+
+
 
     }());
 </script>

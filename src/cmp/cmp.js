@@ -61,7 +61,7 @@ class CMP extends ViewBase {
     }
 
     createAudio() {
-        this.$audio = this.find(".cmp_audio");
+        this.$audio = this.find(".cmp-audio");
         this.audio = this.$audio.get(0);
         this.audio.autoplay = false;
         this.audio.loop = false;
@@ -82,11 +82,11 @@ class CMP extends ViewBase {
     }
 
     createVideo() {
-        this.$video = this.find(".cmp_video");
+        this.$video = this.find(".cmp-video");
     }
 
     createMixer() {
-        this.$mixer = this.find(".cmp_mixer");
+        this.$mixer = this.find(".cmp-mixer");
         this.mixer = new CMPMixer();
         this.mixer.draw({
             container: this.$mixer,
@@ -95,7 +95,7 @@ class CMP extends ViewBase {
     }
 
     createList() {
-        this.$list = this.find(".cmp_list");
+        this.$list = this.find(".cmp-list");
         this.cmpList = new CMPList();
 
         var self = this;
@@ -121,11 +121,11 @@ class CMP extends ViewBase {
 
         try {
             this.audio.src = item.src;
+            this.audio.play();
         } catch (e) {
             this.loadItemError();
             return;
         }
-        this.audio.play();
 
     }
 
@@ -150,7 +150,16 @@ class CMP extends ViewBase {
             title = this.config.name;
         }
 
-        this.find(".cmp_title").html(title);
+        this.find(".cmp-title").html(title);
+    }
+
+    resize() {
+
+        if (this.mixer) {
+            this.mixer.resize();
+        }
+
+
     }
 
     toString() {
