@@ -37,6 +37,12 @@ class CMPMixer extends ViewBase {
         source.connect(this.analyser);
         this.analyser.connect(this.audioContext.destination);
 
+        //var oscillator = this.audioContext.createOscillator();
+        //oscillator.channelCountMode = 'explicit';
+
+        //this.analyser.minDecibels = -90;
+        //this.analyser.maxDecibels = -10;
+
 
         this.mixerIndex = 0;
         this.mixerList = [this.drawLine, this.drawColumns];
@@ -99,10 +105,7 @@ class CMPMixer extends ViewBase {
 
     drawColumns() {
 
-        //this.analyser.minDecibels = -90;
-        this.analyser.maxDecibels = -10;
-
-        //this.analyser.fftSize = 256;
+        //this.analyser.fftSize = 1024;
         this.analyser.smoothingTimeConstant = 0.9;
 
         var array = new Uint8Array(this.analyser.frequencyBinCount);
