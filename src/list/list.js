@@ -5,15 +5,16 @@ var ViewBase = require("../core/view-base.js");
 
 class CMPList extends ViewBase {
 
-    constructor() {
+    constructor(container) {
         super();
+        this.container = $(container);
     }
 
     draw(option) {
         this.option = option;
         var self = this;
 
-        this.container = $(option.container).empty();
+        this.container.empty();
         this.container.delegate(".cmp-list-item", "click", function(e) {
             var $item = $(e.target);
             self.itemClickHandler($item);

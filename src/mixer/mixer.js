@@ -5,14 +5,14 @@ var ViewBase = require("../core/view-base.js");
 
 class CMPMixer extends ViewBase {
 
-    constructor() {
+    constructor(container) {
         super();
+        this.container = $(container);
     }
 
     draw(option) {
 
         this.option = option;
-        this.container = $(option.container);
 
         //https://developer.mozilla.org/zh-CN/docs/Web/API/AudioContext
         this.AudioContext = window.AudioContext || window.webkitAudioContext || window.mozAudioContext || window.msAudioContext;
@@ -29,49 +29,59 @@ class CMPMixer extends ViewBase {
 
     createAnalyser() {
         //https://developer.mozilla.org/en-US/docs/Web/API/BaseAudioContext/createAnalyser
-        var analyser = this.audioContext.createAnalyser();
-        console.log(analyser);
+        this.analyser = this.audioContext.createAnalyser();
+        console.log(this.analyser);
 
         //https://developer.mozilla.org/zh-CN/docs/Web/API/AudioContext/createMediaElementSource
         var source = this.audioContext.createMediaElementSource(this.option.audio);
-        source.connect(analyser);
-        analyser.connect(this.audioContext.destination);
+        source.connect(this.analyser);
+        this.analyser.connect(this.audioContext.destination);
 
+
+        this.mixerIndex = 0;
+        this.mixerList = [this.drawLine, this.drawColumns];
 
         this.canvas = this.find("canvas").get(0);
         this.ctx = this.canvas.getContext('2d');
 
+        var self = this;
+        this.container.bind("click", function(e) {
+            self.mixerIndex += 1;
+        });
+
         this.resize();
 
-        this.drawMixer(analyser);
+        this.drawMixer();
     }
 
-    drawMixer(analyser) {
+    drawMixer() {
 
-        var cw = this.canvas.width;
-        var ch = this.canvas.height;
+        var drawer = this.mixerList[this.mixerIndex];
+        if (!drawer) {
+            drawer = this.mixerList[0];
+            this.mixerIndex = 0;
+        }
+        drawer.call(this);
 
+        var self = this;
+        requestAnimationFrame(function() {
+            self.drawMixer();
+        });
+
+    }
+
+
+    drawLine() {
         //analyser.fftSize = 2048;
-        //analyser.smoothingTimeConstant = 0.95;
 
-        //analyser.minDecibels = -100;
-        //analyser.maxDecibels = -30;
+        var array = new Float32Array(this.analyser.fftSize);
+        this.analyser.getFloatTimeDomainData(array);
 
-        var array = new Float32Array(analyser.fftSize);
-        analyser.getFloatTimeDomainData(array);
-
-
-        var hh = ch * 0.5;
+        var hh = this.height * 0.5;
         var l = array.length;
-        var offset = cw / l;
+        var offset = this.width / l;
 
-        //if (Math.random() > 0.99) {
-        //console.log(analyser.fftSize, l);
-        //console.log(Math.min.apply(null, array), Math.max.apply(null, array));
-        //console.log(array);
-        //}
-
-        this.ctx.clearRect(0, 0, cw, ch);
+        this.ctx.clearRect(0, 0, this.width, this.height);
         this.ctx.strokeStyle = '#00ff00';
         this.ctx.lineWidth = 2;
         this.ctx.lineJoin = "round";
@@ -85,12 +95,42 @@ class CMPMixer extends ViewBase {
 
         this.ctx.stroke();
 
+    }
 
-        var self = this;
-        requestAnimationFrame(function() {
-            self.drawMixer(analyser);
-        });
+    drawColumns() {
 
+        //this.analyser.minDecibels = -90;
+        this.analyser.maxDecibels = -10;
+
+        //this.analyser.fftSize = 256;
+        this.analyser.smoothingTimeConstant = 0.9;
+
+        var array = new Uint8Array(this.analyser.frequencyBinCount);
+        this.analyser.getByteFrequencyData(array);
+
+        // if (Math.random() > 0.95) {
+        //     console.log(array);
+        //     console.log(this.analyser.minDecibels, this.analyser.maxDecibels);
+        // }
+
+        var l = array.length;
+        var offset = this.width / l;
+
+        this.ctx.clearRect(0, 0, this.width, this.height);
+        this.ctx.fillStyle = '#00ff00';
+        this.ctx.beginPath();
+        this.ctx.moveTo(0, this.height);
+
+        for (var i = 0; i < l; i++) {
+            var item = array[i];
+            var w = offset;
+            var h = item / 255 * this.height * 0.9;
+            var x = i * offset;
+            var y = this.height - h;
+            this.ctx.fillRect(x, y, w, h);
+        }
+
+        this.ctx.fill();
     }
 
     resize() {

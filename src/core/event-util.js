@@ -394,6 +394,15 @@ var EventUtil = {
         var events = eventListener.events;
         for (var i = 0; i < events.length; i++) {
             var item = events[i];
+            //skip one called, not removed but called
+            if (item.oneCalled) {
+                //console.log("one called", item);
+                continue;
+            }
+            //tag before call handler, because in handler may trigger once again
+            if (item.one) {
+                item.oneCalled = true;
+            }
             event.handleObj = item;
             event.namespace = item.namespace;
             item.handler.call(target, event, data);
@@ -402,6 +411,7 @@ var EventUtil = {
             }
         }
 
+        //remove all one
         EventUtil.removeEventByOne(eventListener);
 
     },

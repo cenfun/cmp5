@@ -87,16 +87,15 @@ class CMP extends ViewBase {
 
     createMixer() {
         this.$mixer = this.find(".cmp-mixer");
-        this.mixer = new CMPMixer();
+        this.mixer = new CMPMixer(this.$mixer);
         this.mixer.draw({
-            container: this.$mixer,
             audio: this.audio
         });
     }
 
     createList() {
         this.$list = this.find(".cmp-list");
-        this.cmpList = new CMPList();
+        this.cmpList = new CMPList(this.$list);
 
         var self = this;
         this.cmpList.bind("change", function(e, item) {
@@ -108,7 +107,6 @@ class CMP extends ViewBase {
             }
         });
         this.cmpList.draw({
-            container: this.$list,
             list: this.list
         });
     }

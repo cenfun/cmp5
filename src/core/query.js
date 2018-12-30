@@ -59,30 +59,17 @@ var getDefaultDisplay = function(nodeName) {
 };
 
 var getElementDimension = function(node, dimension) {
-    var dimensionProperty = dimension[0].toUpperCase() + dimension.slice(1);
     if (isWindow(node)) {
-        return node["inner" + dimensionProperty];
+        return node["inner" + dimension];
     }
+
     if (isDocument(node)) {
         node = node.body;
     }
-    var v = node["offset" + dimensionProperty];
-    var style = getStyle(node);
-    if (dimension === "width") {
-        var borderLeftWidth = parseFloat(style.borderLeftWidth);
-        var borderRightWidth = parseFloat(style.borderRightWidth);
-        var paddingLeft = parseFloat(style.paddingLeft);
-        var paddingRight = parseFloat(style.paddingRight);
-        v = v - borderLeftWidth - borderRightWidth - paddingLeft - paddingRight;
-        //console.log(v, style.width);
-        return v;
-    }
-    var borderTopWidth = parseFloat(style.borderTopWidth);
-    var borderBottomWidth = parseFloat(style.borderBottomWidth);
-    var paddingTop = parseFloat(style.paddingTop);
-    var paddingBottom = parseFloat(style.paddingBottom);
-    v = v - borderBottomWidth - borderTopWidth - paddingTop - paddingBottom;
-    //console.log(v, style.height);
+
+    var v = node["client" + dimension];
+    //console.log(v);
+
     return v;
 };
 
@@ -147,14 +134,6 @@ class Query extends EventBase {
 
     get(i) {
         return this.list[i];
-    }
-
-    size() {
-        return this.list.length;
-    }
-
-    first() {
-        return this.list[0];
     }
 
     each(callback) {
@@ -249,7 +228,7 @@ class Query extends EventBase {
 
     html(str) {
         if (arguments.length === 0) {
-            var node = this.first();
+            var node = this.get(0);
             if (node) {
                 return node.innerHTML;
             }
@@ -263,9 +242,10 @@ class Query extends EventBase {
 
     width(value) {
         if (arguments.length === 0) {
-            var node = this.first();
+            var node = this.get(0);
             if (node) {
-                return getElementDimension(node, "width");
+                var w = getElementDimension(node, "Width");
+                return w;
             }
             return 0;
         }
@@ -275,9 +255,10 @@ class Query extends EventBase {
 
     height(value) {
         if (arguments.length === 0) {
-            var node = this.first();
+            var node = this.get(0);
             if (node) {
-                return getElementDimension(node, "height");
+                var h = getElementDimension(node, "Height");
+                return h;
             }
             return 0;
         }
@@ -297,7 +278,7 @@ class Query extends EventBase {
                     self.css(k, key[k]);
                 });
             } else {
-                var node = this.first();
+                var node = this.get(0);
                 if (node) {
                     var style = getStyle(node);
                     return style[camelCase(key)];
@@ -327,7 +308,7 @@ class Query extends EventBase {
                     self.attr(k, key[k]);
                 });
             } else {
-                var node = this.first();
+                var node = this.get(0);
                 if (node) {
                     return node.getAttribute(key);
                 }
@@ -353,6 +334,13 @@ class Query extends EventBase {
     }
 
     removeClass(str) {
+        if (!arguments.length) {
+            //remove all
+            this.each(function(node) {
+                node.className = "";
+            });
+            return this;
+        }
         if (!str || typeof(str) !== "string") {
             return this;
         }
@@ -429,7 +417,7 @@ class Query extends EventBase {
     }
 
     focus() {
-        var node = this.first();
+        var node = this.get(0);
         if (node && node.focus) {
             node.focus();
         }
@@ -437,7 +425,7 @@ class Query extends EventBase {
     }
 
     blur() {
-        var node = this.first();
+        var node = this.get(0);
         if (node && node.blur) {
             node.blur();
         }
@@ -445,7 +433,7 @@ class Query extends EventBase {
     }
 
     click() {
-        var node = this.first();
+        var node = this.get(0);
         if (node && node.click) {
             node.click();
         }
@@ -453,7 +441,7 @@ class Query extends EventBase {
     }
 
     select() {
-        var node = this.first();
+        var node = this.get(0);
         if (node && node.select) {
             node.select();
         }
@@ -466,7 +454,7 @@ class Query extends EventBase {
     }
 
     val(v) {
-        var node = this.first();
+        var node = this.get(0);
         if (arguments.length) {
             if (node) {
                 node.value = v;
@@ -484,7 +472,7 @@ class Query extends EventBase {
             left: 0,
             top: 0
         };
-        var node = this.first();
+        var node = this.get(0);
         if (node) {
             var br = node.getBoundingClientRect();
             rect.left = br.left + window.pageXOffset;
@@ -516,7 +504,7 @@ class Query extends EventBase {
     }
 
     contains(elem) {
-        var target = new Query(elem).first();
+        var target = new Query(elem).get(0);
         if (!target) {
             return false;
         }
@@ -543,7 +531,7 @@ class Query extends EventBase {
     }
 
     parent() {
-        var node = this.first();
+        var node = this.get(0);
         if (node) {
             return new Query(node.parentNode);
         }
@@ -595,13 +583,9 @@ class Query extends EventBase {
         if (!jQuery) {
             return null;
         }
-        var $el;
+        var $el = jQuery();
         this.each(function(node) {
-            if ($el) {
-                $el.add(node);
-            } else {
-                $el = jQuery(node);
-            }
+            $el.add(node);
         });
         return $el;
     }
@@ -611,6 +595,12 @@ class Query extends EventBase {
     }
 
 }
+
+Object.defineProperty(Query.prototype, "length", {
+    get: function() {
+        return this.list.length;
+    }
+});
 
 var query = function(selector) {
     return new Query(selector);
