@@ -276,6 +276,36 @@ var Util = {
             parent = parent.parentNode;
         }
         return false;
+    },
+
+    getCookieKey: function(key) {
+        var pre = "cmp5_";
+        key = pre + key;
+        return key;
+    },
+
+    getCookie: function(key) {
+        key = this.getCookieKey(key);
+        var strCookie = document.cookie || "";
+        var list = strCookie.split(";");
+        for (var i = 0, l = list.length; i < l; i++) {
+            var item = list[i];
+            var arr = item.split("=");
+            var k = arr[0];
+            if (k === key) {
+                return arr[1];
+            }
+        }
+        return "";
+    },
+
+    setCookie: function(key, value, days) {
+        key = this.getCookieKey(key);
+        var expireDays = days || 30;
+        var date = new Date();
+        date.setTime(date.getTime() + expireDays * 24 * 3600 * 1000);
+        document.cookie = key + "=" + value + ";expires=" + date.toGMTString();
+
     }
 
 };

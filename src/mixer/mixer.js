@@ -1,4 +1,4 @@
-//var Util = require("../core/util.js");
+var Util = require("../core/util.js");
 var $ = require("../core/query.js");
 
 var ViewBase = require("../core/view-base.js");
@@ -27,6 +27,15 @@ class CMPMixer extends ViewBase {
 
     }
 
+    getMixerIndex() {
+        return this.mixerIndex || Util.getCookie("mixerIndex") || 0;
+    }
+
+    setMixerIndex(index) {
+        this.mixerIndex = index;
+        Util.setCookie("mixerIndex", index);
+    }
+
     createAnalyser() {
         //https://developer.mozilla.org/en-US/docs/Web/API/BaseAudioContext/createAnalyser
         this.analyser = this.audioContext.createAnalyser();
@@ -44,15 +53,15 @@ class CMPMixer extends ViewBase {
         //this.analyser.maxDecibels = -10;
 
 
-        this.mixerIndex = 0;
-        this.mixerList = [this.drawLine, this.drawColumns];
+        this.mixerIndex = this.getMixerIndex();
+        this.mixerList = [this.drawLine, this.drawOceanWaves];
 
         this.canvas = this.find("canvas").get(0);
         this.ctx = this.canvas.getContext('2d');
 
         var self = this;
         this.container.bind("click", function(e) {
-            self.mixerIndex += 1;
+            self.setMixerIndex(self.mixerIndex + 1);
         });
 
         this.resize();
@@ -65,7 +74,7 @@ class CMPMixer extends ViewBase {
         var drawer = this.mixerList[this.mixerIndex];
         if (!drawer) {
             drawer = this.mixerList[0];
-            this.mixerIndex = 0;
+            this.setMixerIndex(0);
         }
         drawer.call(this);
 
@@ -103,7 +112,7 @@ class CMPMixer extends ViewBase {
 
     }
 
-    drawColumns() {
+    drawOceanWaves() {
 
         //this.analyser.fftSize = 1024;
         this.analyser.smoothingTimeConstant = 0.9;
@@ -126,13 +135,12 @@ class CMPMixer extends ViewBase {
 
         for (var i = 0; i < l; i++) {
             var item = array[i];
-            var w = offset;
             var h = item / 255 * this.height * 0.9;
             var x = i * offset;
             var y = this.height - h;
-            this.ctx.fillRect(x, y, w, h);
+            this.ctx.lineTo(x, y);
         }
-
+        this.ctx.closePath();
         this.ctx.fill();
     }
 
