@@ -68,15 +68,32 @@ class CMP extends ViewBase {
         this.audio.preload = true;
         this.audio.controls = true;
 
+        //https://developer.mozilla.org/en-US/docs/Web/API/HTMLAudioElement
+        //https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement
         var self = this;
         this.$audio.bind("timeupdate", function(e) {
             //console.log(e.timeStamp);
-        });
-        this.$audio.bind("ended", function(e) {
+        }).bind("ended", function(e) {
+            self.mixer.stop();
             self.cmpList.next();
-        });
-        this.$audio.bind("error", function(e) {
+        }).bind("error", function(e) {
             self.loadItemError();
+        }).bind("progress", function(e) {
+
+        }).bind("abort", function(e) {
+
+        }).bind("play", function(e) {
+            self.mixer.play();
+        }).bind("playing", function(e) {
+
+        }).bind("pause", function(e) {
+
+        }).bind("loadedmetadata", function(e) {
+
+        }).bind("seeking", function(e) {
+
+        }).bind("volumechange", function(e) {
+
         });
 
     }
@@ -88,9 +105,7 @@ class CMP extends ViewBase {
     createMixer() {
         this.$mixer = this.find(".cmp-mixer");
         this.mixer = new CMPMixer(this.$mixer);
-        this.mixer.draw({
-            audio: this.audio
-        });
+        this.mixer.setAudio(this.audio);
     }
 
     createList() {
@@ -114,6 +129,8 @@ class CMP extends ViewBase {
     loadItem(item) {
 
         //console.log(item);
+
+        Util.currentItem = item;
 
         this.showTitle(item.label);
 

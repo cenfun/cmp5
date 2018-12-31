@@ -8,22 +8,58 @@ class CMPMixer extends ViewBase {
     constructor(container) {
         super();
         this.container = $(container);
-    }
+        var self = this;
+        this.container.bind("click", function(e) {
+            self.setMixerIndex(self.mixerIndex + 1);
+        });
 
-    draw(option) {
+        this.canvas = this.find("canvas").get(0);
+        this.ctx = this.canvas.getContext('2d');
 
-        this.option = option;
+        this.mixerIndex = this.getMixerIndex();
+        this.mixerList = [this.drawLine, this.drawOceanWaves];
 
         //https://developer.mozilla.org/zh-CN/docs/Web/API/AudioContext
-        this.AudioContext = window.AudioContext || window.webkitAudioContext || window.mozAudioContext || window.msAudioContext;
-        try {
-            this.audioContext = new this.AudioContext();
-        } catch (e) {
-            console.log("ERROR: Can NOT create AudioContext");
-            return;
-        }
+        this.audioContext = new AudioContext();
 
-        this.createAnalyser();
+        //https://developer.mozilla.org/en-US/docs/Web/API/BaseAudioContext/createAnalyser
+        this.analyser = this.audioContext.createAnalyser();
+        //this.analyser.channelCountMode = "explicit";
+        //this.analyser.channelInterpretation = 'discrete';
+        //this.analyser.fftSize = 2048;
+
+    }
+
+    setAudio(audio) {
+        this.audio = audio;
+        //https://developer.mozilla.org/zh-CN/docs/Web/API/AudioContext/createMediaElementSource
+        var source = this.audioContext.createMediaElementSource(this.audio);
+        source.connect(this.analyser);
+        this.analyser.connect(this.audioContext.destination);
+    }
+
+    stop() {
+        //console.log("stop");
+        cancelAnimationFrame(this.time_frame);
+        Util.currentItem.freqLength = 0;
+    }
+
+
+    play() {
+        //console.log("play");
+
+        this.stop();
+
+        //https://developer.mozilla.org/en-US/docs/Web/API/AnalyserNode
+
+        //this.analyser.minDecibels = -90;
+        //this.analyser.maxDecibels = -10;
+
+        //console.log(this.analyser);
+
+        this.resize();
+
+        this.drawMixer();
 
     }
 
@@ -36,39 +72,6 @@ class CMPMixer extends ViewBase {
         Util.setCookie("mixerIndex", index);
     }
 
-    createAnalyser() {
-        //https://developer.mozilla.org/en-US/docs/Web/API/BaseAudioContext/createAnalyser
-        this.analyser = this.audioContext.createAnalyser();
-        console.log(this.analyser);
-
-        //https://developer.mozilla.org/zh-CN/docs/Web/API/AudioContext/createMediaElementSource
-        var source = this.audioContext.createMediaElementSource(this.option.audio);
-        source.connect(this.analyser);
-        this.analyser.connect(this.audioContext.destination);
-
-        //var oscillator = this.audioContext.createOscillator();
-        //oscillator.channelCountMode = 'explicit';
-
-        //this.analyser.minDecibels = -90;
-        //this.analyser.maxDecibels = -10;
-
-
-        this.mixerIndex = this.getMixerIndex();
-        this.mixerList = [this.drawLine, this.drawOceanWaves];
-
-        this.canvas = this.find("canvas").get(0);
-        this.ctx = this.canvas.getContext('2d');
-
-        var self = this;
-        this.container.bind("click", function(e) {
-            self.setMixerIndex(self.mixerIndex + 1);
-        });
-
-        this.resize();
-
-        this.drawMixer();
-    }
-
     drawMixer() {
 
         var drawer = this.mixerList[this.mixerIndex];
@@ -79,7 +82,7 @@ class CMPMixer extends ViewBase {
         drawer.call(this);
 
         var self = this;
-        requestAnimationFrame(function() {
+        this.time_frame = requestAnimationFrame(function() {
             self.drawMixer();
         });
 
@@ -87,7 +90,8 @@ class CMPMixer extends ViewBase {
 
 
     drawLine() {
-        //analyser.fftSize = 2048;
+
+        //this.analyser.fftSize = 256;
 
         var array = new Float32Array(this.analyser.fftSize);
         this.analyser.getFloatTimeDomainData(array);
@@ -112,20 +116,43 @@ class CMPMixer extends ViewBase {
 
     }
 
+    getFreqLength(array) {
+        var max = array.length;
+        if (!Util.currentItem.freqLength) {
+            Util.currentItem.freqLength = Math.ceil(max * 0.5);
+        }
+        var min = Util.currentItem.freqLength;
+        for (var i = max - 1; i >= min; i--) {
+            var v = array[i];
+            if (v !== 0) {
+                Util.currentItem.freqLength = i;
+                break;
+            }
+        }
+        return Util.currentItem.freqLength;
+    }
+
     drawOceanWaves() {
 
-        //this.analyser.fftSize = 1024;
-        this.analyser.smoothingTimeConstant = 0.9;
+        this.analyser.smoothingTimeConstant = 0.92;
+
+        //this.analyser.minDecibels = -90;
+        //this.analyser.maxDecibels = 0;
 
         var array = new Uint8Array(this.analyser.frequencyBinCount);
         this.analyser.getByteFrequencyData(array);
 
+
+        var l = this.getFreqLength(array);
+
         // if (Math.random() > 0.95) {
-        //     console.log(array);
-        //     console.log(this.analyser.minDecibels, this.analyser.maxDecibels);
+        //     console.log(l);
+        // console.log(array);
+        // console.log(this.analyser.minDecibels, this.analyser.maxDecibels);
+        // console.log(Math.min.apply(null, array), Math.max.apply(null, array));
         // }
 
-        var l = array.length;
+
         var offset = this.width / l;
 
         this.ctx.clearRect(0, 0, this.width, this.height);
@@ -140,6 +167,7 @@ class CMPMixer extends ViewBase {
             var y = this.height - h;
             this.ctx.lineTo(x, y);
         }
+        this.ctx.lineTo(this.width, this.height);
         this.ctx.closePath();
         this.ctx.fill();
     }
