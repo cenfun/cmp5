@@ -59,7 +59,7 @@ class CMPList extends ViewBase {
 
     drawItem(item, index) {
         var $item = $("<div/>").attr("data", index).addClass("cmp-list-item").appendTo(this.container);
-        $item.html(item.label);
+        $item.html((index + 1) + ", " + item.label);
     }
 
     toString() {

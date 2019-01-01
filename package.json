@@ -16,20 +16,22 @@
         "url": "git://github.com/cenfun/cmp5.git"
     },
     "main": "dist/cmp5.js",
-    "dependencies": {},
+    "dependencies": {
+        "@babel/polyfill": "^7.2.5"
+    },
     "devDependencies": {
-        "@babel/core": "^7.0.0",
-        "@babel/preset-env": "^7.0.0",
-        "babel-loader": "^8.0.2",
-        "browser-sync": "^2.18.8",
-        "css-loader": "^1.0.0",
+        "@babel/core": "^7.2.2",
+        "@babel/preset-env": "^7.2.3",
+        "babel-loader": "^8.0.4",
+        "browser-sync": "^2.26.3",
+        "css-loader": "^1.0.1",
         "html-loader": "^0.5.5",
-        "node-sass": "^4.9.3",
+        "node-sass": "^4.11.0",
         "raw-loader": "^0.5.1",
         "sass-loader": "^7.1.0",
-        "style-loader": "^0.23.0",
-        "url-loader": "^1.1.1",
-        "webpack": "^4.17.2"
+        "style-loader": "^0.23.1",
+        "url-loader": "^1.1.2",
+        "webpack": "^4.28.3"
     },
     "scripts": {
         "build": "node ./scripts/cli.js build",

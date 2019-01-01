@@ -4,6 +4,8 @@
 <head>
     <meta charset="utf-8">
     <title>CMP5</title>
+    <script src="../node_modules/@babel/polyfill/dist/polyfill.min.js"></script>
+    <script src="../dist/cmp5.js"></script>
     <style>
         html,
         body {
@@ -23,8 +25,6 @@
 <body>
     <div class="cmp_container"></div>
 </body>
-
-<script src="../dist/cmp5.js"></script>
 <script>
     (function() {
         "use strict";
@@ -33,7 +33,6 @@
             name: "CMP5 - 『生活需要音乐』",
             link: "http://bbs.cenfun.com/",
             description: "CMP5 - 『生活需要音乐』 - http://bbs.cenfun.com/",
-            logo: "{src:logo.png,xywh:[10R,10R,0,0]}",
 
             skins: "skins/skin_default.js",
             plugins: "",
@@ -70,11 +69,7 @@
         }, {
             type: "",
             src: "music/test.mp3",
-            label: "MP3音乐测试"
-        }, {
-            type: "",
-            src: "music/test.mp4",
-            label: "mp4视频测试"
+            label: "MP3 Test"
         }];
 
         var cmp5 = window.cmp5;
@@ -93,9 +88,9 @@
             });
         });
 
-
-
     }());
 </script>
+
+
 
 </html>

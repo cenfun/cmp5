@@ -55,6 +55,7 @@ cmp-list
 */
 
 .cmp-list {
+    top: 50%;
     height: 50%;
     overflow-y: auto;
 }
@@ -79,7 +80,6 @@ cmp-list
 cmp-mixer
 */
 .cmp-mixer {
-    top: 50%;
     height: 50%;
     background: #000000;
 }

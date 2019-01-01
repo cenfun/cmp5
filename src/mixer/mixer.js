@@ -19,48 +19,13 @@ class CMPMixer extends ViewBase {
         this.mixerIndex = this.getMixerIndex();
         this.mixerList = [this.drawLine, this.drawOceanWaves];
 
-        //https://developer.mozilla.org/zh-CN/docs/Web/API/AudioContext
-        this.audioContext = new AudioContext();
-
-        //https://developer.mozilla.org/en-US/docs/Web/API/BaseAudioContext/createAnalyser
-        this.analyser = this.audioContext.createAnalyser();
-        //this.analyser.channelCountMode = "explicit";
-        //this.analyser.channelInterpretation = 'discrete';
-        //this.analyser.fftSize = 2048;
+        this.resize();
 
     }
 
     setAudio(audio) {
         this.audio = audio;
-        //https://developer.mozilla.org/zh-CN/docs/Web/API/AudioContext/createMediaElementSource
-        var source = this.audioContext.createMediaElementSource(this.audio);
-        source.connect(this.analyser);
-        this.analyser.connect(this.audioContext.destination);
-    }
-
-    stop() {
-        //console.log("stop");
-        cancelAnimationFrame(this.time_frame);
-        Util.currentItem.freqLength = 0;
-    }
-
-
-    play() {
-        //console.log("play");
-
-        this.stop();
-
-        //https://developer.mozilla.org/en-US/docs/Web/API/AnalyserNode
-
-        //this.analyser.minDecibels = -90;
-        //this.analyser.maxDecibels = -10;
-
-        //console.log(this.analyser);
-
-        this.resize();
-
-        this.drawMixer();
-
+        this.initAudioContext();
     }
 
     getMixerIndex() {
@@ -71,6 +36,53 @@ class CMPMixer extends ViewBase {
         this.mixerIndex = index;
         Util.setCookie("mixerIndex", index);
     }
+
+    //========================================================================================
+
+    async stop() {
+        //console.log("stop");
+        cancelAnimationFrame(this.time_frame);
+
+        this.freqLength = 0;
+
+    }
+
+
+    async play() {
+        //console.log("play");
+
+        await this.stop();
+
+        //https://developer.mozilla.org/en-US/docs/Web/API/AnalyserNode
+
+        //this.analyser.minDecibels = -90;
+        //this.analyser.maxDecibels = -10;
+
+        //console.log(this.analyser);
+
+        this.drawMixer();
+
+    }
+
+    initAudioContext() {
+        //https://developer.mozilla.org/zh-CN/docs/Web/API/AudioContext
+        this.audioContext = new AudioContext();
+
+        //https://developer.mozilla.org/en-US/docs/Web/API/BaseAudioContext/createAnalyser
+        this.analyser = this.audioContext.createAnalyser();
+        //this.analyser.channelCountMode = "explicit";
+        //this.analyser.channelInterpretation = 'discrete';
+        //this.analyser.fftSize = 2048;
+
+        //https://developer.mozilla.org/zh-CN/docs/Web/API/AudioContext/createMediaElementSource
+        this.mediaElementSource = this.audioContext.createMediaElementSource(this.audio);
+        this.mediaElementSource.connect(this.analyser);
+
+        this.analyser.connect(this.audioContext.destination);
+
+    }
+
+    //========================================================================================
 
     drawMixer() {
 
@@ -118,18 +130,18 @@ class CMPMixer extends ViewBase {
 
     getFreqLength(array) {
         var max = array.length;
-        if (!Util.currentItem.freqLength) {
-            Util.currentItem.freqLength = Math.ceil(max * 0.5);
+        if (!this.freqLength) {
+            this.freqLength = Math.ceil(max * 0.5);
         }
-        var min = Util.currentItem.freqLength;
+        var min = this.freqLength;
         for (var i = max - 1; i >= min; i--) {
             var v = array[i];
             if (v !== 0) {
-                Util.currentItem.freqLength = i;
+                this.freqLength = i;
                 break;
             }
         }
-        return Util.currentItem.freqLength;
+        return this.freqLength;
     }
 
     drawOceanWaves() {
@@ -171,6 +183,8 @@ class CMPMixer extends ViewBase {
         this.ctx.closePath();
         this.ctx.fill();
     }
+
+    //========================================================================================
 
     resize() {
         this.width = this.container.width();
