@@ -17,7 +17,7 @@ class CMPMixer extends ViewBase {
         this.ctx = this.canvas.getContext('2d');
 
         this.mixerIndex = this.getMixerIndex();
-        this.mixerList = [this.drawLine, this.drawOceanWaves];
+        this.mixerList = [this.drawSpectrum , this.drawLine, this.drawOceanWaves];
 
         this.resize();
 
@@ -99,7 +99,38 @@ class CMPMixer extends ViewBase {
         });
 
     }
-
+    drawSpectrum() {
+        var meterWidth = 5, //频谱条宽度
+        gap = 6, //频谱条间距
+        capHeight = 2,
+        capYPositionArray = []; //将上一画面各帽头的位置保存到这个数组
+        var gradient = this.ctx.createLinearGradient(0, 0, 0, 350);
+        gradient.addColorStop(1, '#0f0');
+        gradient.addColorStop(0.5, '#ff0');
+        gradient.addColorStop(0, '#f00');
+        var array = new Uint8Array(this.analyser.frequencyBinCount);
+        var l=this.getFreqLength(array);
+        this.analyser.getByteFrequencyData(array);
+        var step = Math.round(array.length / l); //计算采样步长
+        this.ctx.clearRect(0, 0, this.width, this.height);
+        for (var i = 0; i < l; i++) {
+                var value = array[i * step]; //获取当前能量值
+                if (capYPositionArray.length < l) {
+                    capYPositionArray.push(value); //初始化保存帽头位置的数组，将第一个画面的数据压入其中
+                };
+                this.ctx.fillStyle = '#fff';
+                //开始绘制帽头
+                if (value < capYPositionArray[i]) { //如果当前值小于之前值
+                    this.ctx.fillRect(i * gap, this.height - (--capYPositionArray[i]), meterWidth, capHeight); //则使用前一次保存的值来绘制帽头
+                } else {
+                    this.ctx.fillRect(i * gap, this.height - value, meterWidth, capHeight); //否则使用当前值直接绘制
+                    capYPositionArray[i] = value;
+                };
+                //开始绘制频谱条
+                this.ctx.fillStyle = gradient;
+                this.ctx.fillRect(i * gap, this.height - value + capHeight, meterWidth, this.height);
+        }
+    }
 
     drawLine() {
 

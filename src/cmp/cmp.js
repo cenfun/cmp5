@@ -5,7 +5,7 @@ var template = require("./cmp.html");
 
 var $ = require("../core/query.js");
 
-var Loading = require("../ui/loading/loading.js");
+var Loading = require("../ui/loading/loading.js"); 
 
 var Util = require("../core/util.js");
 
@@ -14,6 +14,9 @@ var ViewBase = require("../core/view-base.js");
 var defaultConfig = require("../config/config.js");
 
 var CMPList = require("../list/list.js");
+
+var CMPLrc = require("../lrc/lrc.js");
+
 var CMPMixer = require("../mixer/mixer.js");
 
 class CMP extends ViewBase {
@@ -26,7 +29,7 @@ class CMP extends ViewBase {
     }
 
     setConfig(config) {
-        this.config = Util.merge({}, defaultConfig, config);
+        this.config = Util.merge({lrcforward:0.6,lrc_trans:'2'}, defaultConfig, config);
         return this;
     }
 
@@ -50,6 +53,7 @@ class CMP extends ViewBase {
 
         this.showTitle();
 
+        this.createLrc();
         this.createAudio();
 
         this.createVideo();
@@ -60,6 +64,14 @@ class CMP extends ViewBase {
 
     }
 
+    createLrc(){
+        this.$lrc = this.find(".cmp-lrc");
+        this.lrc = new CMPLrc(this.$lrc);
+        var self=this;
+        this.$lrc.bind("click", function(e) {
+            self.mixer.setMixerIndex(self.mixer.getMixerIndex()+1);
+        });
+    }
     createAudio() {
         this.$audio = this.find(".cmp-audio");
         this.audio = this.$audio.get(0);
@@ -67,10 +79,16 @@ class CMP extends ViewBase {
         this.audio.loop = false;
         this.audio.preload = true;
         this.audio.controls = true;
-
+        /***
+            Anonymous 支持播放直接跨域MP3，但是301跨域资源 需要 Access-Control-Allow-Origin为*
+        ***/
+        this.audio.crossOrigin  = 'Anonymous'; 
         //https://developer.mozilla.org/en-US/docs/Web/API/HTMLAudioElement
         //https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement
         var self = this;
+        this.audio.ontimeupdate =function(){
+            Util.currentItem.lrcLoaded && self.lrc.asyncLrc(self.audio.currentTime);
+        };
         this.$audio.bind("timeupdate", function(e) {
             //console.log(e.timeStamp);
         }).bind("ended", function(e) {
@@ -131,10 +149,20 @@ class CMP extends ViewBase {
         //console.log(item);
 
         Util.currentItem = item;
-
+        this.lrc.showLrc('');
+        Util.currentItem.lrcLoaded=false;
         this.showTitle(item.label);
-
         try {
+            if(item.lrc){
+                //歌词翻译配置 0为不翻译 1为翻译 2为显示双语
+                var lrc_trans = item.hasOwnProperty('lrc_trans') ? item.lrc_trans: this.config.lrc_trans;
+                if ('2' !== lrc_trans) {
+                    lrc_trans = lrc_trans == '0' || lrc_trans == 'false' ? false: true;
+                }
+                this.lrc.setForward(item.lrcforward || this.config.lrcforward);
+                this.lrc.setTrans(lrc_trans);
+                Util.currentItem.lrcLoaded=this.lrc.fetchLrc(item.lrc);
+            }
             this.audio.src = item.src;
             this.audio.play();
         } catch (e) {
