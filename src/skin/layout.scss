@@ -4,13 +4,15 @@
 ==================================================
 cmp
 */
-
 .cmp {
     position: relative;
     width: 100%;
     height: 100%;
     display: flex;
     flex-direction: column;
+    //background-color:#002;background-image:radial-gradient(circle at center,#045,#002);
+    color:#000;
+    font:1em "Open Sans",sans-serif;
 }
 
 .cmp-head {
@@ -26,6 +28,7 @@ cmp
 .cmp-foot {
     border-top: 1px solid #999;
     height: 60px;
+    
 }
 
 .cmp-body {
@@ -80,7 +83,21 @@ cmp-list
 cmp-mixer
 */
 .cmp-mixer {
+    z-index:10;
     height: 50%;
+    background: #000000;
+    position: absolute;
+}
+
+/*
+==================================================
+cmp-video
+*/
+.cmp-video {
+    z-index:12;
+    width:100%;
+    height: 50%;
+    position: absolute;
     background: #000000;
 }
 
@@ -88,18 +105,45 @@ cmp-mixer
 ==================================================
 cmp-lrc
 */
-.cmp-lrc {
-    display: none;
+@-webkit-keyframes Sidebar_rainbowBorder{
+    0%,to{background-image:linear-gradient(115deg,#4fcf70,#fad648,#a767e5,#12bcfe)}
+    25%{background-image:linear-gradient(115deg,#fad648,#a767e5,#12bcfe,#4fcf70)}
+    50%{background-image:linear-gradient(115deg,#a767e5,#12bcfe,#4fcf70,#fad648)}
+    75%{background-image:linear-gradient(115deg,#12bcfe,#4fcf70,#fad648,#a767e5)}
 }
-
+@keyframes Sidebar_rainbowBorder{
+    0%,to{background-image:linear-gradient(115deg,#4fcf70,#fad648,#a767e5,#12bcfe)}
+    25%{background-image:linear-gradient(115deg,#fad648,#a767e5,#12bcfe,#4fcf70)}
+    50%{background-image:linear-gradient(115deg,#a767e5,#12bcfe,#4fcf70,#fad648)}
+    75%{background-image:linear-gradient(115deg,#12bcfe,#4fcf70,#fad648,#a767e5)}
+}
+.cmp-lrc {
+    z-index:11;
+    word-wrap:break-word;
+    position:fixed;
+    left:0;
+    top:60px;
+    text-align:center;
+    line-height:2rem;
+    font-size:1.8rem;
+    max-height:6rem;
+    color:transparent;
+    width:100%;
+    display:block;
+    background-image: linear-gradient(115deg,#4fcf70,#fad648,#a767e5,#12bcfe,#44ce7b);
+    -webkit-animation: Sidebar_rainbowBorder .9s linear infinite;
+    animation: Sidebar_rainbowBorder .9s linear infinite;
+    -webkit-background-clip: text;
+    
+}
 /*
 ==================================================
 cmp-control
 */
 
 .cmp-control {
-    position: fixed;
     bottom: 0px;
 }
+
 
 .cmp-audio {}
