@@ -26,8 +26,6 @@ class CMPLrc extends ViewBase {
         }
         if (i > 0) {
             this.showLrc(this.lrcs[i - 1][1]);
-        } else{
-            this.showLrc(this.lrcs[0][1]);
         }
     }
     showLrc(line){
@@ -38,36 +36,20 @@ class CMPLrc extends ViewBase {
         this.lrcs=[];
         /*** 支持网易云Json***/
         var self=this;
-        if (window.jQuery) { 
-            //优先Jsop解决歌词跨域
-            if(lrc_src.indexOf('callback=')){
-                window.jQuery.getJSON(lrc_src+'?&callback=?',function(result){
-                    self.lrcs = self.parseLRC(result);
+        try{
+            return new Promise((resolve, reject) => {
+                fetch(lrc_src,{mode: 'cors'}).then(res => res.json()).catch(error => { resolve(false) }).then(response => {
+                     self.lrcs =  self.parseLRC(response);
+                     self.lrcs.length>0?resolve(true):resolve(false);
                 });
-            }else{
-                window.jQuery.ajax({
-                        url: lrc_src,
-                        type: 'get',
-                        dataType: 'text',
-                        success: function(result){
-                            self.lrcs=self.parseLRC(JSON.parse(result));
-                        }
-                    });
-            }
-            
-        }else if(window.fetch){
-           fetch(lrc_src,{mode: 'cors'}).then(res =>res.text()).then(text =>{
-                //console.log(text);
-                 self.lrcs =  self.parseLRC(JSON.parse(text));
-                
             });
+        }catch(e){
+            console.log(e);
         }
-         return self.lrcs.length>0?true:false;
     }
-    parseLRC(lrcData) {
-            if('object'===typeof lrcData){
+    parseLRC(lrcJson) {
+            if('object'===typeof lrcJson){
                 try {
-                    let lrcJson=lrcData;
                     if(true === lrcJson.uncollected){
                         return [];
                     }
@@ -75,22 +57,22 @@ class CMPLrc extends ViewBase {
                         优先按照配置获取 获取不到 则有啥选啥
                     ***/
                     let lrcText=false;
-                    if( this.trans==false  &&   lrcJson.hasOwnProperty('lrc') &&   lrcJson.lrc.lyric !=null ){
+                    if('2'===this.trans){
+                        return this.bilingualLRC(lrcJson);
+                    }else if( this.trans==false  &&   lrcJson.hasOwnProperty('lrc') &&   lrcJson.lrc.lyric !=null ){
                         lrcText=lrcJson.lrc.lyric; 
                     }else if( this.trans ==true && lrcJson.hasOwnProperty('tlyric') &&    lrcJson.tlyric.lyric !=null ){
                         lrcText=lrcJson.tlyric.lyric;
-                    } else if('2'===this.trans){
-                        return this.bilingualLRC(lrcJson);
-                    }
+                    }  
                     if(false === lrcText){
                         lrcText = lrcJson.lrc.lyric || lrcJson.tlyric.lyric;
                     }
-                    lrcData = lrcText;
+                    lrcJson = lrcText;
                 } catch(e) {
                     return [];
                 }
             }
-            return this.analysisLrc(lrcData);
+            return this.analysisLrc(lrcJson);
             
     }
     /***双语歌词同时显示***/
@@ -116,22 +98,38 @@ class CMPLrc extends ViewBase {
         }
         return this.analysisLrc(lrc1||lrc2);
     }
+    timeFormatSecond(timeString){
+        var temp = timeString.split(':');
+        return parseInt(temp[0], 10) * 60 + parseFloat(temp[1]);
+    }
     analysisLrc(lrcData){
+                if(!lrcData || lrcData.indexOf(']')==-1){
+                    return [];
+                }
                 var lines = lrcData.split('\n'),
-                pattern = /\[\d{2}:\d{2}.\d{2}\]/g;
+                timeRegexp = /\[(\d{2,3}\:\d{2}\.*[0-9]*)\]/,
+                tagRegexp=/^\[(ti|by|ar|al)\:(.+)\]/i;
                 var result = [];
-                const info={'ti':[0,'歌名'],'by':[2,'歌词作者'],'ar':[0,'歌手'],'al':[0,'专辑名']};
-                lines.map(function(data,item){
-                    var index = data.indexOf(']');
-                    var time = data.substring(0, index+1), value = data.substring(index+1);
-                    var timeString = time.substring(1, time.length-2);
-                    var timeArr = timeString.split(':');
-                    var prefix=(timeArr[0]).toLowerCase();
-                    if( info.hasOwnProperty(prefix)){
-                        result.push([info[prefix][0], info[prefix][1]+":"+timeArr[1]]);
-                    }else{
-                         var key = parseInt(timeArr[0], 10) * 60 + parseFloat(timeArr[1]);
-                            !isNaN(key) && value != "" && result.push([key, value]);
+                var self=this;
+                const info={'ti':[1.1,'歌名'],'by':[1.2,'歌词作者'],'ar':[2.2,'歌手'],'al':[3.3,'专辑名']};
+                lines.map(function(value,item){
+                    if( tagRegexp.test(value)){
+                        var tag=value.match(tagRegexp);
+                        var prefix=(tag[1]).toLowerCase();
+                        if(info.hasOwnProperty(prefix)){
+                            result.push([info[prefix][0], info[prefix][1]+":"+tag[2]]);
+                        }
+                    }else if(timeRegexp.test(value)){
+                        let timeArr=[];
+                        while(timeRegexp.test(value)){ //修复多时间歌词标签 [01:00.16][02:33.61][03:33]
+                            let fitToTime=value.match(timeRegexp);
+                            value=value.replace(fitToTime[0],'');
+                            timeArr.push(self.timeFormatSecond(fitToTime[1]));
+                        }
+                        for(var i in timeArr){
+                            var key = timeArr[i];
+                            !isNaN(key) &&value!='' && result.push([key, value]);
+                        }
                     }
                 })
                 result.sort(function(a, b) {

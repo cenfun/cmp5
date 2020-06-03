@@ -118,6 +118,25 @@ class CMP extends ViewBase {
 
     createVideo() {
         this.$video = this.find(".cmp-video");
+        this.video = this.$video.get(0);
+        this.video.autoplay = false;
+        this.video.loop = false;
+        this.video.preload = true;
+        this.video.controls = true; 
+        var self=this;
+        this.$video.bind("timeupdate", function(e) {
+            //console.log(e.timeStamp);
+        }).bind("ended", function(e) {
+            self.cmpList.next();
+        }).bind("play", function(e) {
+            console.log('ended');
+            self.mixer.stop();
+        }).bind("error", function(e) {
+            self.loadItemError();
+        }).bind("abort", function(e) {
+            console.log(e);
+        });
+        
     }
 
     createMixer() {
@@ -144,27 +163,39 @@ class CMP extends ViewBase {
         });
     }
 
-    loadItem(item) {
+    async loadItem(item) {
 
         //console.log(item);
-
         Util.currentItem = item;
         this.lrc.showLrc('');
         Util.currentItem.lrcLoaded=false;
         this.showTitle(item.label);
         try {
-            if(item.lrc){
-                //¸è´Ê·­ÒëÅäÖÃ 0Îª²»·­Òë 1Îª·­Òë 2ÎªÏÔÊ¾Ë«Óï
-                var lrc_trans = item.hasOwnProperty('lrc_trans') ? item.lrc_trans: this.config.lrc_trans;
-                if ('2' !== lrc_trans) {
-                    lrc_trans = lrc_trans == '0' || lrc_trans == 'false' ? false: true;
+            if(item.type=='video' || item.type=='mp4' || item.type=='2' || item.mp4 ||item.src.indexOf('.mp4')>0){
+                await this.audio.pause();
+                this.$audio.hide();
+                this.$video.show();
+                this.video.src=item.mp4||item.src;
+                this.video.play();
+                
+            }else if(item.type=='audio' ||item.type=='mp3' || item.type=='1' ||  item.src.indexOf('.mp3')>0){
+                await this.video.pause();
+                
+                this.$video.hide();
+                this.$audio.show();
+                if(item.lrc){
+                    //¸è´Ê·­ÒëÅäÖÃ 0Îª²»·­Òë 1Îª·­Òë 2ÎªÏÔÊ¾Ë«Óï
+                    var lrc_trans = item.hasOwnProperty('lrc_trans') ? item.lrc_trans: this.config.lrc_trans;
+                    if ('2' !== lrc_trans) {
+                        lrc_trans = lrc_trans == '0' || lrc_trans == 'false' ? false: true;
+                    }
+                    this.lrc.setForward(item.lrcforward || this.config.lrcforward);
+                    this.lrc.setTrans(lrc_trans);
+                    this.lrc.fetchLrc(item.lrc).then(res=>{ Util.currentItem.lrcLoaded = res });
                 }
-                this.lrc.setForward(item.lrcforward || this.config.lrcforward);
-                this.lrc.setTrans(lrc_trans);
-                Util.currentItem.lrcLoaded=this.lrc.fetchLrc(item.lrc);
-            }
-            this.audio.src = item.src;
-            this.audio.play();
+                this.audio.src = item.src;
+                this.audio.play();
+            } 
         } catch (e) {
             this.loadItemError();
             return;
