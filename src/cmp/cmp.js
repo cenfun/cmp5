@@ -173,7 +173,7 @@ class CMP extends ViewBase {
         try {
             if(item.type=='video' || item.type=='mp4' || item.type=='2' || item.mp4 ||item.src.indexOf('.mp4')>0){
                 await this.audio.pause();
-                this.$audio.hide();
+                //this.$audio.hide();
                 this.$video.show();
                 this.video.src=item.mp4||item.src;
                 this.video.play();
@@ -182,7 +182,7 @@ class CMP extends ViewBase {
                 await this.video.pause();
                 
                 this.$video.hide();
-                this.$audio.show();
+                //this.$audio.show();
                 if(item.lrc){
                     //¸è´Ê·­ÒëÅäÖÃ 0Îª²»·­Òë 1Îª·­Òë 2ÎªÏÔÊ¾Ë«Óï
                     var lrc_trans = item.hasOwnProperty('lrc_trans') ? item.lrc_trans: this.config.lrc_trans;
